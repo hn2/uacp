@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fusionlayer.app/uacp/schema/0.2.0/encrypted-envelope",
+  "title": "UACP Encrypted Envelope",
+  "type": "object",
+  "required": ["uacp_encrypted", "algorithm", "iv", "auth_tag", "ciphertext", "key_derivation"],
+  "properties": {
+    "uacp_encrypted": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "algorithm": { "type": "string", "enum": ["aes-256-gcm"] },
+    "iv": { "type": "string" },
+    "auth_tag": { "type": "string" },
+    "ciphertext": { "type": "string" },
+    "key_derivation": {
+      "type": "object",
+      "required": ["method", "salt"],
+      "properties": {
+        "method": { "type": "string" },
+        "salt": { "type": "string" }
+      }
+    }
+  }
+}

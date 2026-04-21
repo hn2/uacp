@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fusionlayer.app/uacp/schema/0.2.0/export",
+  "title": "UACP Export Bundle",
+  "type": "object",
+  "required": ["uacp_export", "exported_at", "conversations"],
+  "properties": {
+    "uacp_export": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "exported_at": { "type": "string", "format": "date-time" },
+    "source": { "type": "string" },
+    "conversations": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}

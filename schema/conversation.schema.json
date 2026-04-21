@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fusionlayer.app/uacp/schema/0.2.0/conversation",
+  "title": "UACP Conversation",
+  "description": "Universal AI Context Protocol conversation object v0.2.0",
+  "type": "object",
+  "required": ["uacp", "id", "tool", "messages"],
+  "additionalProperties": true,
+  "properties": {
+    "uacp": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "id": { "type": "string", "minLength": 1 },
+    "tool": { "type": "string", "minLength": 1 },
+    "model": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+            "id": { "type": "string" },
+            "provider": { "type": "string" },
+            "snapshot_date": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "title": { "type": "string" },
+    "privacy": { "type": "string", "enum": ["private", "personal", "team", "public"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "project": { "type": "string" },
+    "branches": { "type": "array", "items": { "type": "string" } },
+    "messages": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/message" }
+    },
+    "metadata": { "type": "object" }
+  },
+  "$defs": {
+    "message": {
+      "type": "object",
+      "required": ["role", "content"],
+      "properties": {
+        "id": { "type": "string" },
+        "parent_id": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "assistant", "system", "tool"] },
+        "content": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "$ref": "#/$defs/content_block" } }
+          ]
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "model": { "oneOf": [{ "type": "string" }, { "type": "object" }] },
+        "tokens": {
+          "type": "object",
+          "properties": {
+            "input": { "type": "number" },
+            "output": { "type": "number" }
+          }
+        },
+        "status": { "type": "string", "enum": ["complete", "in_progress", "error"] },
+        "tool_calls": { "type": "array" },
+        "tool_call_id": { "type": "string" },
+        "name": { "type": "string" },
+        "attachments": { "type": "array" },
+        "citations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/citation" }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "metadata": { "type": "object" }
+      }
+    },
+    "content_block": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text", "image", "file", "code", "thinking", "artifact_ref", "audio", "video", "pdf", "latex"]
+        },
+        "text": { "type": "string" },
+        "code": { "type": "string" },
+        "url": { "type": "string" },
+        "id": { "type": "string" },
+        "language": { "type": "string" },
+        "filename": { "type": "string" },
+        "signature": { "type": "string" },
+        "mime_type": { "type": "string" },
+        "duration_s": { "type": "number" },
+        "title": { "type": "string" },
+        "display": { "type": "boolean" }
+      }
+    },
+    "citation": {
+      "type": "object",
+      "required": ["span", "source"],
+      "properties": {
+        "span": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "source": {
+          "type": "object",
+          "required": ["url"],
+          "properties": {
+            "url": { "type": "string" },
+            "title": { "type": "string" },
+            "snippet": { "type": "string" }
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["id", "type", "title", "content"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["code", "html", "svg", "markdown", "react", "text"] },
+        "title": { "type": "string" },
+        "language": { "type": "string" },
+        "content": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
