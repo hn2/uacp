@@ -1,9 +1,17 @@
-# Unified AI Context Protocol (UACP) — Specification v0.2.0
+# Unified AI Context Protocol (UACP) — Specification v0.3.0
 
 > This file is slated for extraction to a dedicated `fusionlayer/uacp` repo (public later). Do not modify in-place without updating the extraction plan.
 
 ## Status
 **Draft** — not yet published externally.
+
+## Conventions
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) when, and only when, they appear in all capitals.
+
+All timestamps in UACP are **RFC 3339 / ISO 8601**, normalized to **UTC**, with **millisecond precision**: `YYYY-MM-DDTHH:MM:SS.sssZ` (the `.sss` fractional-seconds segment is RECOMMENDED; parsers MUST accept values without it). Non-UTC offsets MUST NOT be emitted.
+
+All character-offset fields (e.g. citation `span`) count **Unicode scalar values** (Unicode code points) across the concatenation of the message's text content — equivalently `Array.from(text).length` in JavaScript or iteration over Python `str`. Byte offsets, UTF-16 code units, and grapheme clusters MUST NOT be used.
 
 ---
 
@@ -274,23 +282,44 @@ When conversations are transmitted or stored encrypted, they are wrapped:
 
 ```json
 {
-  "uacp_encrypted": "0.1.0",
+  "uacp_encrypted": "0.3.0",
   "algorithm": "aes-256-gcm",
-  "iv": "hex-encoded-iv",
-  "auth_tag": "hex-encoded-auth-tag",
-  "ciphertext": "hex-encoded-ciphertext",
+  "iv": "a1b2c3d4e5f60708090a0b0c",
+  "auth_tag": "112233445566778899aabbccddeeff00",
+  "ciphertext": "...",
+  "aad": "",
   "key_derivation": {
     "method": "argon2id+hkdf",
-    "salt": "base64-encoded-salt"
+    "salt": "dGVzdC1zYWx0LTE2Yg",
+    "argon2id": { "m": 65536, "t": 3, "p": 1, "output_length": 32 },
+    "hkdf":     { "hash": "sha256", "output_length": 32 },
+    "info":     "uacp-key-v1"
   }
 }
 ```
 
-The `ciphertext` decrypts to a UACP Conversation Object.
+The `ciphertext` decrypts to a **canonicalized** UACP Conversation Object (JCS — RFC 8785: UTF-8, sorted keys, no insignificant whitespace) so that byte-level round-trip is deterministic.
 
-**Canonical key derivation parameters** (implementations MUST use these defaults):
-- Argon2id: `m=65536` (64 MB), `t=3` iterations, `p=1` parallelism
-- HKDF: `hkdf-sha256`, `info = "uacp-key-v1"`, output length 32 bytes
+### 6.1 Field requirements (normative)
+
+- `iv` — lowercase hex, exactly 24 characters (12 bytes / 96 bits). Implementations MUST use a fresh, uniformly random IV per `(key, ciphertext)` pair. Reuse is a critical security defect.
+- `auth_tag` — lowercase hex, exactly 32 characters (16 bytes / 128 bits). Full GCM tag, not truncated.
+- `ciphertext` — lowercase hex, non-empty.
+- `aad` — lowercase hex. If omitted or empty, implementations MUST use, as AAD, the UTF-8 bytes of: `uacp_encrypted + ":" + key_derivation.info` (e.g. `"0.3.0:uacp-key-v1"`). This binds envelope metadata to the plaintext and prevents downgrade.
+- `key_derivation.salt` — base64url (RFC 4648 §5) without padding permitted; decoded length MUST be ≥ 16 bytes.
+- `key_derivation.argon2id.{m, t, p, output_length}` — MUST be the canonical values `{65536, 3, 1, 32}`. A future spec version that changes these MUST also change `info`.
+- `key_derivation.hkdf.hash` — MUST be `"sha256"`. `output_length` MUST be `32`.
+- `key_derivation.info` — MUST be `"uacp-key-v1"` for this spec version. This string binds the HKDF output to a specific KDF configuration; future parameter changes MUST bump it.
+
+### 6.2 Key derivation
+
+```
+master_key = argon2id(passphrase, salt,  m=65536, t=3, p=1, output=32)
+content_key = HKDF-SHA256(ikm=master_key, salt=salt, info="uacp-key-v1", L=32)
+ciphertext || auth_tag = AES-256-GCM(key=content_key, iv=iv, aad=aad, plaintext=JCS(conversation))
+```
+
+Implementations MUST NOT pad plaintext. Implementations SHOULD NOT leak message count via envelope size; if padding is desired, it MUST be applied to the canonicalized plaintext before encryption (not to the envelope).
 
 ---
 
@@ -404,6 +433,8 @@ Reserved metadata namespaces:
 
 **Extension namespace rule:** Custom values in any field (role, content_block.type, tool names, metadata keys) MUST use reverse-domain format: `com.example.my-type`. Bare-word types are reserved for future spec additions forever.
 
+**Schema extension policy:** Conversation, message, content_block, artifact, tool_call, attachment, citation, and redactions objects are closed (`unevaluatedProperties: false`) under the schemas shipped with this spec. Vendors MUST place additional structured data inside the per-object `metadata` object, never as sibling top-level keys. This is the contract that lets writers round-trip unknown data (see §12): a strict validator will accept `metadata.x-vendor-foo` on any object, but reject `x-vendor-foo` as a sibling of `role` on a message. Profiles that need stricter validation MAY tighten schemas further; they MUST NOT relax them.
+
 Example:
 ```json
 {
@@ -435,9 +466,18 @@ UACP uses semantic versioning. The `uacp` field in every object indicates the ve
 
 **Version negotiation rules:**
 - Implementations MUST accept conversations with a compatible major version, even if they don't understand all fields.
-- Unknown fields MUST be preserved on round-trip — never silently dropped.
-- Readers MUST accept (and ignore) unknown top-level fields.
-- Writers SHOULD NOT mix major versions within one conversation object.
+- Unknown keys inside any `metadata` object MUST be preserved on round-trip — never silently dropped.
+- Unknown keys that are siblings of defined fields (i.e. outside `metadata`) MUST be rejected by strict validators per §10. Non-strict validators MAY ignore them.
+- Writers SHOULD NOT mix major versions within one export bundle.
+
+**What counts as breaking (normative).** A change is breaking, and MUST increment the major version, if it does any of:
+1. Removes a required field or makes a previously optional field required.
+2. Tightens an enum, regex, or numeric range such that a previously valid document becomes invalid.
+3. Changes the semantic meaning of an existing field (including its units, encoding, or canonicalization).
+4. Changes any encryption parameter locked in §6 (`info`, KDF params, algorithm, IV/tag lengths).
+5. Reassigns or removes a reserved namespace (`uacp.*`, `fusionlayer.*`).
+
+Purely additive changes (new optional fields inside an existing object's schema; new enum values declared as "readers MUST accept unknown values" at the field's definition site; new conformance profiles) are **minor** bumps. Editorial, prose-only, and test-vector-only changes are **patch** bumps.
 
 ---
 
@@ -693,13 +733,13 @@ UACP conversations captured from MCP-enabled tools (Claude Code, Continue.dev) S
 
 ---
 
-## Appendix A: Full Example (v0.2.0)
+## Appendix A: Full Example (v0.3.0)
 
 This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3), an artifact (§2.4), and the expanded model field (§2.6).
 
 ```json
 {
-  "uacp": "0.2.0",
+  "uacp": "0.3.0",
   "id": "conv_2026042101",
   "tool": "claude-code",
   "model": { "id": "claude-sonnet-4-6", "provider": "anthropic", "snapshot_date": "2026-04-21" },
@@ -770,6 +810,6 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 
 ---
 
-*UACP Spec v0.2.0 — Draft*
+*UACP Spec v0.3.0 — Draft*
 *Maintainer: FusionLayer (fusionlayer.app)*
-*Created: 2026-04-17 | Updated: 2026-04-21 (v0.2.0)*
+*Created: 2026-04-17 | Updated: 2026-04-26 (v0.3.0)*
