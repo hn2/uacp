@@ -1,10 +1,10 @@
 {
-  "uacp_export": "0.2.0",
+  "uacp_export": "0.3.0",
   "exported_at": "2026-04-21T17:00:00Z",
   "source": "fusionlayer",
   "conversations": [
     {
-      "uacp": "0.2.0",
+      "uacp": "0.3.0",
       "id": "tv_export_1",
       "tool": "chatgpt",
       "title": "Quick question",
@@ -18,7 +18,7 @@
       "metadata": {}
     },
     {
-      "uacp": "0.2.0",
+      "uacp": "0.3.0",
       "id": "tv_export_2",
       "tool": "claude-code",
       "title": "Code review",

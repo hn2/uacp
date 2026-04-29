@@ -1,5 +1,5 @@
 {
-  "uacp": "0.2.0",
+  "uacp": "0.3.0",
   "id": "tv_03_tools",
   "tool": "claude-code",
   "model": { "id": "claude-sonnet-4-6", "provider": "anthropic" },
@@ -22,7 +22,7 @@
       "timestamp": "2026-04-21T11:00:03Z",
       "model": "anthropic:claude-sonnet-4-6",
       "tool_calls": [
-        { "id": "call_1", "name": "write_file", "arguments": { "path": "hello.txt", "content": "Hello, world!" } }
+        { "call_id": "call_1", "name": "write_file", "arguments": { "path": "hello.txt", "content": "Hello, world!" } }
       ]
     },
     {
@@ -30,7 +30,7 @@
       "role": "tool",
       "parent_id": "msg_2",
       "content": "File written successfully",
-      "tool_call_id": "call_1",
+      "call_id": "call_1",
       "name": "write_file",
       "timestamp": "2026-04-21T11:00:04Z"
     }

@@ -1,5 +1,5 @@
 {
-  "uacp": "0.2.0",
+  "uacp": "0.3.0",
   "id": "tv_07_thinking",
   "tool": "claude",
   "model": "anthropic:claude-opus-4-7",

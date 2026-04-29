@@ -1,4 +1,4 @@
-# Unified AI Context Protocol (UACP) — Specification v0.3.0
+# Unified AI Context Protocol (UACP) — Specification v0.4.0
 
 > This file is slated for extraction to a dedicated `fusionlayer/uacp` repo (public later). Do not modify in-place without updating the extraction plan.
 
