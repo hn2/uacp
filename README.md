@@ -195,25 +195,25 @@ The `attachments` array items follow this schema:
 
 ```json
 {
-  "type": "file",
-  "name": "report.pdf",
-  "mime": "application/pdf",
+  "id": "att_report_pdf",
+  "filename": "report.pdf",
+  "mime_type": "application/pdf",
   "size_bytes": 204800,
   "url": "https://example.com/report.pdf",
-  "data_base64": null,
-  "hash_sha256": "a3b4c5..."
+  "data": null,
+  "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
 }
 ```
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | yes | `file`, `image`, `audio`, `video` |
-| `name` | string | yes | Filename |
-| `mime` | string | yes | MIME type |
+| `id` | string | yes | Attachment identifier |
+| `filename` | string | no | Filename hint |
+| `mime_type` | string | yes | MIME type |
 | `size_bytes` | number | no | File size |
 | `url` | string | no | Remote URL |
-| `data_base64` | string | no | Inline base64-encoded content |
-| `hash_sha256` | string | no | SHA-256 hex digest for integrity |
+| `data` | string | no | Inline base64-encoded content |
+| `sha256` | string | no | SHA-256 lowercase hex digest |
 
 ---
 
