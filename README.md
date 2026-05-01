@@ -812,3 +812,10 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 *UACP Spec v0.3.0 — Draft*
 *Maintainer: FusionLayer (fusionlayer.app)*
 *Created: 2026-04-17 | Updated: 2026-04-26 (v0.3.0)*
+
+## 14. Validation And Boundary
+
+- Run 
+ode validate.js for a fast conformance pre-check over 	est-vectors/.
+- See [docs/UACP-BOUNDARY.md](docs/UACP-BOUNDARY.md) for the canonical boundary between UACP data primitives and orchestration/runtime policy.
+
