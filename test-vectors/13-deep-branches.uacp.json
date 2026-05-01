@@ -15,6 +15,6 @@
   ],
   "metadata": {
     "uacp.test.expect": "valid",
-    "uacp.test.comment": "Branch-of-branch. Messages form a tree via parent_id. Leaves listed in branches[]. The canonical (reader default) path is whichever leaf appears LAST in branches[]. Implementations MUST NOT renumber or reorder messages on reserialize."
+    "uacp.test.comment": "Branch-of-branch. Messages form a tree via parent_id. branches[] lists non-canonical leaf message IDs. Canonical path selection is implementation-defined and MUST NOT depend on branches[] ordering. Implementations MUST NOT renumber or reorder messages on reserialize."
   }
 }
