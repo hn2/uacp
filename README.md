@@ -1,9 +1,7 @@
 # Unified AI Context Protocol (UACP) — Specification v0.4.0
 
-> This file is slated for extraction to a dedicated `fusionlayer/uacp` repo (public later). Do not modify in-place without updating the extraction plan.
 
-## Status
-**Draft** — not yet published externally.
+Relationship and boundary guidance with ACP: [docs/ACP-UACP-RELATIONSHIP.md](docs/ACP-UACP-RELATIONSHIP.md)
 
 ## Conventions
 
@@ -39,7 +37,7 @@ A UACP conversation is a JSON object:
 
 ```json
 {
-  "uacp": "0.1.0",
+  "uacp": "0.4.0",
   "id": "conv_a1b2c3d4",
   "tool": "chatgpt",
   "model": "gpt-4o",
@@ -327,7 +325,7 @@ Implementations MUST NOT pad plaintext. Implementations SHOULD NOT leak message 
 When injecting context from past conversations into a new session:
 
 ```
-[FusionLayer Context — UACP v0.1.0]
+[FusionLayer Context — UACP v0.4.0]
 Relevant conversations from your history:
 
 1. [chatgpt, 2026-04-10] "Build a sync daemon"
@@ -345,7 +343,7 @@ For tools that support structured context (MCP, system prompts):
 
 ```json
 {
-  "uacp_context": "0.1.0",
+  "uacp_context": "0.4.0",
   "injected_at": "2026-04-16T10:00:00Z",
   "conversations": [
     {
@@ -369,12 +367,12 @@ A UACP export is a `.uacp.json` file containing an array of conversations:
 
 ```json
 {
-  "uacp_export": "0.1.0",
+  "uacp_export": "0.4.0",
   "exported_at": "2026-04-16T12:00:00Z",
   "source": "fusionlayer",
   "conversations": [
-    { "uacp": "0.1.0", "id": "...", ... },
-    { "uacp": "0.1.0", "id": "...", ... }
+    { "uacp": "0.4.0", "id": "...", ... },
+    { "uacp": "0.4.0", "id": "...", ... }
   ]
 }
 ```
@@ -732,7 +730,7 @@ UACP conversations captured from MCP-enabled tools (Claude Code, Continue.dev) S
 
 ---
 
-## Appendix A: Full Example (v0.3.0)
+## Appendix A: Full Example (v0.4.0)
 
 This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3), an artifact (§2.4), and the expanded model field (§2.6).
 
@@ -809,13 +807,15 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 
 ---
 
-*UACP Spec v0.3.0 — Draft*
+*UACP Spec v0.4.0 - Draft*
 *Maintainer: FusionLayer (fusionlayer.app)*
-*Created: 2026-04-17 | Updated: 2026-04-26 (v0.3.0)*
+*Created: 2026-04-17 | Updated: 2026-05-02 (v0.4.0)*
 
 ## 14. Validation And Boundary
 
 - Run 
 ode validate.js for a fast conformance pre-check over 	est-vectors/.
 - See [docs/UACP-BOUNDARY.md](docs/UACP-BOUNDARY.md) for the canonical boundary between UACP data primitives and orchestration/runtime policy.
+
+
 
