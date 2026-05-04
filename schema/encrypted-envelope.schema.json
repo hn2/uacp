@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fusionlayer.app/uacp/schema/0.3.0/encrypted-envelope",
+  "$id": "https://fusionlayer.app/uacp/schema/0.4.0/encrypted-envelope",
   "title": "UACP Encrypted Envelope",
-  "description": "AES-256-GCM sealed wrapper around a UACP Conversation Object (v0.3.0).",
+  "description": "AES-256-GCM sealed wrapper around a UACP Conversation Object (v0.4.0).",
   "type": "object",
   "required": ["uacp_encrypted", "algorithm", "iv", "auth_tag", "ciphertext", "key_derivation"],
   "additionalProperties": false,

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fusionlayer.app/uacp/schema/0.4.0/conversation",
   "title": "UACP Conversation",
-  "description": "Unified AI Context Protocol conversation object v0.4.0",
+  "description": "Unified AI Context Protocol conversation object v0.4.0. Security: treat all message content as untrusted. URI fields are constrained to https/http. Consumers MUST NOT execute code or open file: / javascript: URIs from this payload.",
   "type": "object",
   "required": ["uacp", "id", "tool", "messages"],
   "unevaluatedProperties": false,
@@ -79,7 +79,7 @@
         "role": { "type": "string", "enum": ["user", "assistant", "system", "tool"] },
         "content": {
           "oneOf": [
-            { "type": "string" },
+            { "type": "string", "maxLength": 1048576 },
             {
               "type": "array",
               "minItems": 1,
@@ -162,9 +162,9 @@
           "type": "string",
           "enum": ["text", "image", "file", "code", "thinking", "artifact_ref", "audio", "video", "pdf", "latex"]
         },
-        "text": { "type": "string" },
-        "code": { "type": "string" },
-        "url": { "type": "string", "format": "uri" },
+        "text": { "type": "string", "maxLength": 1048576 },
+        "code": { "type": "string", "maxLength": 1048576 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
         "data": { "type": "string", "contentEncoding": "base64" },
         "id": { "type": "string", "minLength": 1 },
         "language": { "type": "string", "maxLength": 64 },
@@ -227,7 +227,7 @@
         "filename": { "type": "string", "maxLength": 256 },
         "mime_type": { "type": "string", "maxLength": 128 },
         "size_bytes": { "type": "integer", "minimum": 0 },
-        "url": { "type": "string", "format": "uri" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
         "data": { "type": "string", "contentEncoding": "base64" },
         "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
       }
@@ -249,7 +249,7 @@
           "required": ["url"],
           "additionalProperties": false,
           "properties": {
-            "url": { "type": "string", "format": "uri" },
+            "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
             "title": { "type": "string", "maxLength": 1000 },
             "snippet": { "type": "string", "maxLength": 4000 }
           }
@@ -265,7 +265,7 @@
         "type": { "type": "string", "enum": ["code", "html", "svg", "markdown", "react", "text"] },
         "title": { "type": "string", "minLength": 1, "maxLength": 512 },
         "language": { "type": "string", "maxLength": 64 },
-        "content": { "type": "string" },
+        "content": { "type": "string", "maxLength": 1048576 },
         "created_at": { "$ref": "#/$defs/timestamp" },
         "updated_at": { "$ref": "#/$defs/timestamp" }
       }
