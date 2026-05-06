@@ -1,5 +1,17 @@
 # UACP Changelog
 
+## [Unreleased] — 2026-05-06
+
+### Changed
+- OSS scrub: removed product-specific references from README, CONFORMANCE.md, GOVERNANCE.md, docs/ACP-UACP-RELATIONSHIP.md (#15).
+- ACP retirement: ACP-UACP-RELATIONSHIP.md rewritten to history note; all 7 ACP extension drafts audited and decided (drop/absorb/private) (#19).
+- validate.js: switched to Ajv 2020-12 draft (`ajv/dist/2020`) — was silently skipping schema validation for JSON Schema 2020-12 documents (#20).
+- test-vectors/04-multimodal-image: replaced `data:` URI with `https://example.com/placeholder.png` to conform with schema URL pattern constraint.
+
+### Added
+- conformance/harness/run.js: public conformance harness ported from private repo, FusionLayer-specific imports removed (#21). Run `node conformance/harness/run.js` for self-test.
+- .github/workflows/validate-vectors.yml: CI runs `node validate.js` + `node conformance/harness/run.js` on push/PR.
+
 ## [0.4.0] — 2026-04-29
 
 ### Added — normative

@@ -1,0 +1,176 @@
+#!/usr/bin/env node
+// UACP Conformance Test Harness
+// Run against any UACP implementation to verify L1/L2/L3 compliance.
+//
+// Usage: node conformance/harness/run.js [--level L1|L2|L3] [--impl ./path/to/my-impl.js]
+//
+// impl module must export:
+//   parse(doc: object): object   — optional; UACP object → internal representation
+//   serialize(internal: object): object — optional; internal → UACP object
+//
+// Without --impl: harness runs validation-only self-test against all test vectors.
+
+const fs = require('node:fs')
+const path = require('node:path')
+const Ajv = require('ajv/dist/2020')
+const addFormats = require('ajv-formats')
+
+const REPO_ROOT = path.resolve(__dirname, '..', '..')
+const VECTORS_DIR = path.join(REPO_ROOT, 'test-vectors')
+const SCHEMA_DIR = path.join(REPO_ROOT, 'schema')
+
+// --- Schema loading ---
+function loadAjv() {
+  const ajv = new Ajv({ strict: false, allErrors: true })
+  addFormats(ajv)
+  for (const name of fs.readdirSync(SCHEMA_DIR)) {
+    if (!name.endsWith('.schema.json')) continue
+    const schema = JSON.parse(fs.readFileSync(path.join(SCHEMA_DIR, name), 'utf8'))
+    ajv.addSchema(schema, schema['$id'])
+  }
+  return ajv
+}
+
+function detectSchemaId(doc) {
+  if (doc && typeof doc.uacp_encrypted === 'string') return 'https://fusionlayer.app/uacp/schema/0.4.0/encrypted-envelope'
+  if (doc && typeof doc.uacp_export === 'string') return 'https://fusionlayer.app/uacp/schema/0.4.0/export'
+  return 'https://fusionlayer.app/uacp/schema/0.4.0/conversation'
+}
+
+function validateDoc(ajv, doc) {
+  const schemaId = detectSchemaId(doc)
+  const valid = ajv.validate(schemaId, doc)
+  const errors = (ajv.errors || []).map(e => `${e.instancePath || '(root)'} ${e.message}`)
+  return { valid, errors }
+}
+
+// L1–L3 vector sets per CONFORMANCE.md
+const LEVEL_VECTORS = {
+  L1: ['01-minimal-chat.uacp.json', '02-multi-message.uacp.json', '03-tool-use.uacp.json'],
+  L2: ['04-multimodal-image.uacp.json', '05-branched-conversation.uacp.json', '06-with-artifacts.uacp.json'],
+  L3: ['07-extended-thinking.uacp.json', '08-with-citations.uacp.json', '09-privacy-levels.uacp.json',
+       '10-redacted-message.uacp.json', '11-invalid-version-field.uacp.json', '12-invalid-missing-messages.uacp.json'],
+}
+
+async function runConformance({ level = 'L3', impl } = {}) {
+  const ajv = loadAjv()
+  const levelOrder = ['L1', 'L2', 'L3']
+  const minIdx = levelOrder.indexOf(level)
+  const levelsToTest = levelOrder.slice(0, minIdx + 1)
+
+  const results = []
+  let passed = 0
+  let failed = 0
+
+  // Run all 21 test vectors for self-test; use level subsets for external impl
+  const allVectors = fs.readdirSync(VECTORS_DIR).filter(n => n.endsWith('.json')).sort()
+
+  for (const filename of allVectors) {
+    const filePath = path.join(VECTORS_DIR, filename)
+    let doc
+    try {
+      doc = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+    } catch (e) {
+      results.push({ filename, pass: false, error: `parse error: ${e.message}` })
+      failed++
+      continue
+    }
+
+    const expectInvalid = doc?.metadata?.['uacp.test.expect'] === 'invalid'
+    const { valid, errors } = validateDoc(ajv, doc)
+
+    if (expectInvalid) {
+      if (!valid) {
+        results.push({ filename, pass: true, note: `expected invalid — ${errors[0] ?? ''}` })
+        passed++
+      } else {
+        results.push({ filename, pass: false, error: 'expected validation failure but passed' })
+        failed++
+      }
+      continue
+    }
+
+    if (!valid) {
+      results.push({ filename, pass: false, error: errors.join('; ') })
+      failed++
+      continue
+    }
+
+    // Optional round-trip test if impl provided
+    if (impl?.parse && impl?.serialize) {
+      try {
+        const internal = impl.parse(doc)
+        const exported = impl.serialize(internal)
+        if (exported.id !== doc.id || exported.tool !== doc.tool) {
+          results.push({ filename, pass: false, error: 'round-trip: id or tool changed' })
+          failed++
+          continue
+        }
+        if (exported.messages?.length !== doc.messages?.length) {
+          results.push({ filename, pass: false, error: 'round-trip: message count changed' })
+          failed++
+          continue
+        }
+      } catch (err) {
+        results.push({ filename, pass: false, error: `round-trip threw: ${err.message}` })
+        failed++
+        continue
+      }
+    }
+
+    results.push({ filename, pass: true })
+    passed++
+  }
+
+  return { level: computeAchievedLevel(results), passed, failed, results }
+}
+
+function computeAchievedLevel(results) {
+  if (results.every(r => r.pass)) return 'L3'
+  const l1Files = LEVEL_VECTORS.L1
+  if (l1Files.every(f => results.find(r => r.filename === f)?.pass)) {
+    const l2Files = [...LEVEL_VECTORS.L1, ...LEVEL_VECTORS.L2]
+    if (l2Files.every(f => results.find(r => r.filename === f)?.pass)) return 'L2'
+    return 'L1'
+  }
+  return 'none'
+}
+
+// CLI entry point
+async function main() {
+  const args = process.argv.slice(2)
+  let level = 'L3'
+  let implPath = null
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--level' && args[i + 1]) level = args[++i]
+    if (args[i] === '--impl' && args[i + 1]) implPath = args[++i]
+  }
+
+  let impl = null
+  if (implPath) {
+    impl = require(path.resolve(process.cwd(), implPath))
+  }
+
+  const result = await runConformance({ level, impl })
+
+  console.log(`\nUACP Conformance Harness`)
+  console.log(`========================`)
+  console.log(`Conformance level achieved: ${result.level}`)
+  console.log(`Passed: ${result.passed}  Failed: ${result.failed}\n`)
+
+  for (const r of result.results) {
+    const icon = r.pass ? '✓' : '✗'
+    const extra = r.note ? ` (${r.note})` : r.error ? ` — ${r.error}` : ''
+    console.log(`${icon} ${r.filename}${extra}`)
+  }
+
+  if (result.failed > 0) {
+    console.log(`\n✗ Conformance check failed`)
+    process.exit(1)
+  } else {
+    console.log(`\n✓ All checks passed`)
+  }
+}
+
+main().catch(e => { console.error(e); process.exit(1) })

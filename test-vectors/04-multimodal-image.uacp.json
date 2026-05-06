@@ -11,7 +11,7 @@
       "role": "user",
       "content": [
         { "type": "text", "text": "What's in this image?" },
-        { "type": "image", "url": "data:image/png;base64,iVBORw0KGgo=" }
+        { "type": "image", "url": "https://example.com/placeholder.png" }
       ],
       "timestamp": "2026-04-21T12:00:01Z"
     },

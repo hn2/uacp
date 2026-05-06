@@ -325,7 +325,7 @@ Implementations MUST NOT pad plaintext. Implementations SHOULD NOT leak message 
 When injecting context from past conversations into a new session:
 
 ```
-[FusionLayer Context — UACP v0.4.0]
+[UACP Context v0.4.0]
 Relevant conversations from your history:
 
 1. [chatgpt, 2026-04-10] "Build a sync daemon"
@@ -369,7 +369,7 @@ A UACP export is a `.uacp.json` file containing an array of conversations:
 {
   "uacp_export": "0.4.0",
   "exported_at": "2026-04-16T12:00:00Z",
-  "source": "fusionlayer",
+  "source": "my-tool-name",
   "conversations": [
     { "uacp": "0.4.0", "id": "...", ... },
     { "uacp": "0.4.0", "id": "...", ... }
@@ -425,8 +425,7 @@ Content-Type: application/json
 Tool-specific data goes in `metadata` fields. The top-level `metadata` object and per-message `metadata` objects are both free-form.
 
 Reserved metadata namespaces:
-- `uacp.*` — protocol-level metadata
-- `fusionlayer.*` — FusionLayer implementation metadata
+- `uacp.*` — protocol-level metadata (spec-controlled)
 
 **Extension namespace rule:** Custom values in any field (role, content_block.type, tool names, metadata keys) MUST use reverse-domain format: `com.example.my-type`. Bare-word types are reserved for future spec additions forever.
 
@@ -472,7 +471,7 @@ UACP uses semantic versioning. The `uacp` field in every object indicates the ve
 2. Tightens an enum, regex, or numeric range such that a previously valid document becomes invalid.
 3. Changes the semantic meaning of an existing field (including its units, encoding, or canonicalization).
 4. Changes any encryption parameter locked in §6 (`info`, KDF params, algorithm, IV/tag lengths).
-5. Reassigns or removes a reserved namespace (`uacp.*`, `fusionlayer.*`).
+5. Reassigns or removes a reserved namespace (`uacp.*`).
 
 Purely additive changes (new optional fields inside an existing object's schema; new enum values declared as "readers MUST accept unknown values" at the field's definition site; new conformance profiles) are **minor** bumps. Editorial, prose-only, and test-vector-only changes are **patch** bumps.
 
@@ -724,9 +723,9 @@ UACP conversations captured from MCP-enabled tools (Claude Code, Continue.dev) S
 | **State** | Immutable conversation records | Stateful session between model and tool server |
 | **Memory** | First-class (conversation history IS the data) | Via tool calls (read_resource, etc.) |
 | **Streaming** | Optional `status: "in_progress"` on messages | Native streaming via SSE |
-| **Spec owner** | FusionLayer / community | Anthropic |
+| **Spec owner** | Community | Anthropic |
 
-**How they work together:** A UACP conversation can include `tool_calls` that were executed via MCP (see Appendix B for field mapping). FL uses UACP as the canonical storage format for conversations captured from MCP-enabled tools (Claude Code, Continue.dev, etc.).
+**How they work together:** A UACP conversation can include `tool_calls` that were executed via MCP (see Appendix B for field mapping). Implementations can use UACP as the canonical storage format for conversations captured from MCP-enabled tools (Claude Code, Continue.dev, etc.).
 
 ---
 
@@ -745,7 +744,7 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
   "created_at": "2026-04-21T10:00:00Z",
   "updated_at": "2026-04-21T10:15:00Z",
   "tags": ["algorithms", "javascript"],
-  "project": "fusionlayer",
+  "project": "my-project",
   "messages": [
     {
       "id": "msg_1",
@@ -800,7 +799,7 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
   ],
   "metadata": {
     "claude-code.session_id": "sess_abc123",
-    "claude-code.working_directory": "/home/user/fusionlayer"
+    "claude-code.working_directory": "/home/user/my-project"
   }
 }
 ```
@@ -808,8 +807,8 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 ---
 
 *UACP Spec v0.4.0 - Draft*
-*Maintainer: FusionLayer (fusionlayer.app)*
-*Created: 2026-04-17 | Updated: 2026-05-02 (v0.4.0)*
+*Community specification — see GOVERNANCE.md*
+*Created: 2026-04-17 | Updated: 2026-05-06 (v0.4.0)*
 
 ## 14. Validation And Boundary
 

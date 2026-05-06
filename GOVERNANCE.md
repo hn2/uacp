@@ -83,8 +83,7 @@ public disclosure. The steward will publish a fix and coordinate the
 advisory within 14 days of confirmation, unless an earlier public
 disclosure is necessary to prevent ongoing harm.
 
-Contact: `security@fusionlayer.app` (until the public repo is open; after
-which the process moves to a `SECURITY.md` in the repo).
+Contact: See `SECURITY.md` in this repository for the current responsible disclosure contact.
 
 ## 7. Media type and file extension
 

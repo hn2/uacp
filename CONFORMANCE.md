@@ -49,9 +49,8 @@ To claim level N, an implementation MUST pass every check below at or below N:
 ## 3. Harness interface
 
 Implementations provide a small adapter implementing this contract. The
-reference harness lives at
-`packages/shared/src/uacp/conformance/harness.js` in the FusionLayer repo and
-calls these methods.
+reference harness lives at `conformance/harness/run.js` in this repository
+and calls these methods.
 
 ```ts
 interface UACPImpl {
@@ -78,11 +77,15 @@ interface UACPImpl {
 Run the harness:
 
 ```bash
-node harness.js --level L3 --impl ./path/to/my-impl.js
+# Self-test (validate UACP's own test vectors):
+node conformance/harness/run.js
+
+# Test your implementation:
+node conformance/harness/run.js --level L3 --impl ./path/to/my-impl.js
 ```
 
-The harness iterates every file in `test-vectors/`, honors the `_expect`
-hint, and reports a pass/fail summary plus the failing assertion IDs.
+The harness iterates every file in `test-vectors/`, honors the `uacp.test.expect`
+metadata hint, and reports a pass/fail summary plus error detail per vector.
 
 ## 4. Provenance
 
@@ -102,7 +105,7 @@ Provenance defaults are defined in the spec; they are **not enforced** by the sc
 
 | Implementation | Language | Level | Verified | Notes |
 |---|---|---|---|---|
-| FusionLayer (reference) | JavaScript (Node.js) | L3 | 2026-04-29 | Reference; ships the harness. |
+| UACP reference harness | JavaScript (Node.js) | L3 | 2026-04-29 | Ships with this repo at `conformance/harness/`. |
 
 Implementations submit entries via PR against this file. The PR MUST include
 a harness log showing all tests passing, the harness commit SHA, and the
@@ -110,4 +113,4 @@ impl SHA tested.
 
 ---
 
-*UACP Conformance — maintained by the FusionLayer team until the public repo is published, at which point governance transfers per `GOVERNANCE.md`.*
+*UACP Conformance — see GOVERNANCE.md for maintainer policy.*
