@@ -1,0 +1,13 @@
+{
+  "name": "uacp",
+  "version": "0.4.0",
+  "description": "Unified AI Context Protocol — schema validator and test harness",
+  "type": "commonjs",
+  "scripts": {
+    "validate": "node validate.js test-vectors/*.json"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  }
+}
