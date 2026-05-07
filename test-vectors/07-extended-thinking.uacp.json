@@ -1,10 +1,9 @@
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "tv_07_thinking",
   "tool": "claude",
   "model": "anthropic:claude-opus-4-7",
   "title": "Extended thinking example",
-  "privacy": "personal",
   "created_at": "2026-04-21T15:00:00Z",
   "updated_at": "2026-04-21T15:00:30Z",
   "messages": [

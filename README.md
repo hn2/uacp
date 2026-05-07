@@ -1,4 +1,6 @@
-# Unified AI Context Protocol (UACP) — Specification v0.4.0
+# Unified AI Context Protocol (UACP) — Specification v0.5.0
+
+**UACP Core v0.5.0 — vendor-neutral conversation format. Optional extensions add privacy taxonomy (`uacp-privacy`), encryption envelope (`uacp-encryption`), and sync protocol (`uacp-sync`).**
 
 
 Relationship and boundary guidance with ACP: [docs/ACP-UACP-RELATIONSHIP.md](docs/ACP-UACP-RELATIONSHIP.md)
@@ -23,13 +25,13 @@ UACP (Unified AI Context Protocol) is an open standard for representing, storing
 - Vendor-neutral conversation format
 - Support all AI interaction types (chat, code, agent, multimodal)
 - Enable cross-tool context injection
-- Preserve privacy metadata
-- Extensible for tool-specific data
+- Extensible for tool-specific data via optional extensions and metadata
 
 ### Non-Goals
-- Define encryption or transport (those are implementation choices)
+- Define encryption or transport (those are implementation choices — see `uacp-encryption` extension)
 - Replace tool-native formats (UACP is an interchange format)
-- Mandate real-time sync (sync is implementation-level)
+- Mandate real-time sync (sync is implementation-level — see `uacp-sync` extension)
+- Define any particular privacy model (that is implementation policy — see `uacp-privacy` extension)
 
 ---
 
@@ -39,12 +41,11 @@ A UACP conversation is a JSON object:
 
 ```json
 {
-  "uacp": "0.4.0",
+  "uacp": "0.5.0",
   "id": "conv_a1b2c3d4",
   "tool": "chatgpt",
   "model": "gpt-4o",
   "title": "Build a sync daemon in Node.js",
-  "privacy": "personal",
   "created_at": "2026-04-16T10:00:00Z",
   "updated_at": "2026-04-16T10:45:00Z",
   "messages": [
@@ -80,14 +81,14 @@ A UACP conversation is a JSON object:
 |-------|------|-------------|
 | `model` | string or object | AI model used — string (canonical) or `{ id, provider?, snapshot_date? }` (see §2.6) |
 | `title` | string | Conversation title/summary |
-| `privacy` | string | Privacy level: `private`, `personal`, `team`, `public` |
+| `extensions` | string[] | Optional list of UACP extension identifiers this document uses (e.g. `["uacp-privacy"]`) |
 | `created_at` | string | ISO 8601 timestamp |
 | `updated_at` | string | ISO 8601 timestamp |
 | `tags` | string[] | User-defined tags |
 | `project` | string | Project/workspace context |
 | `branches` | string[] | Leaf message IDs of non-linear branches (see §2.1) |
 | `tool_chain` | string[] | Ordered list of tool IDs when conversation crossed multiple tools (e.g. `["claude-code", "claude"]`) |
-| `metadata` | object | Tool-specific extension data |
+| `metadata` | object | Freeform extension data. Use namespaced keys (e.g. `uacp_privacy.level`, `com.example.foo`) |
 
 ---
 
@@ -262,63 +263,44 @@ Custom tools use reverse-domain notation: `com.example.mytool`
 
 ---
 
-## 5. Privacy Levels
+## 5. Privacy Levels (moved to extension)
 
-| Level | Description | Sync behavior |
-|-------|-------------|---------------|
-| `private` | Local only, never transmitted | No sync |
-| `personal` | User's own devices only | Encrypted sync |
-| `team` | Visible to team/group members | Group-key encrypted sync |
-| `public` | Anyone with the link | Public share link |
+Privacy classification is an optional extension, not a core concern.
 
-Default: `personal`
+Different products have different privacy models. UACP core does not dictate any particular privacy taxonomy.
 
----
-
-## 6. Encryption Envelope
-
-When conversations are transmitted or stored encrypted, they are wrapped:
+To attach privacy metadata to a conversation, use the `uacp-privacy` extension:
 
 ```json
 {
-  "uacp_encrypted": "0.3.0",
-  "algorithm": "aes-256-gcm",
-  "iv": "a1b2c3d4e5f60708090a0b0c",
-  "auth_tag": "112233445566778899aabbccddeeff00",
-  "ciphertext": "...",
-  "aad": "",
-  "key_derivation": {
-    "method": "argon2id+hkdf",
-    "salt": "dGVzdC1zYWx0LTE2Yg",
-    "argon2id": { "m": 65536, "t": 3, "p": 1, "output_length": 32 },
-    "hkdf":     { "hash": "sha256", "output_length": 32 },
-    "info":     "uacp-key-v1"
+  "extensions": ["uacp-privacy"],
+  "metadata": {
+    "uacp_privacy.level": "personal"
   }
 }
 ```
 
-The `ciphertext` decrypts to a **canonicalized** UACP Conversation Object (JCS — RFC 8785: UTF-8, sorted keys, no insignificant whitespace) so that byte-level round-trip is deterministic.
+Or use a vendor-namespaced field for product-specific semantics:
 
-### 6.1 Field requirements (normative)
-
-- `iv` — lowercase hex, exactly 24 characters (12 bytes / 96 bits). Implementations MUST use a fresh, uniformly random IV per `(key, ciphertext)` pair. Reuse is a critical security defect.
-- `auth_tag` — lowercase hex, exactly 32 characters (16 bytes / 128 bits). Full GCM tag, not truncated.
-- `ciphertext` — lowercase hex, non-empty.
-- `aad` — lowercase hex. If omitted or empty, implementations MUST use, as AAD, the UTF-8 bytes of: `uacp_encrypted + ":" + key_derivation.info` (e.g. `"0.3.0:uacp-key-v1"`). This binds envelope metadata to the plaintext and prevents downgrade.
-- `key_derivation.salt` — base64url (RFC 4648 §5) without padding permitted; decoded length MUST be ≥ 16 bytes.
-- `key_derivation.argon2id.{m, t, p, output_length}` — MUST be the canonical values `{65536, 3, 1, 32}`. A future spec version that changes these MUST also change `info`.
-- `key_derivation.hkdf.hash` — MUST be `"sha256"`. `output_length` MUST be `32`.
-- `key_derivation.info` — MUST be `"uacp-key-v1"` for this spec version. This string binds the HKDF output to a specific KDF configuration; future parameter changes MUST bump it.
-
-### 6.2 Key derivation
-
-```
-master_key = argon2id(passphrase, salt,  m=65536, t=3, p=1, output=32)
-content_key = HKDF-SHA256(ikm=master_key, salt=salt, info="uacp-key-v1", L=32)
-ciphertext || auth_tag = AES-256-GCM(key=content_key, iv=iv, aad=aad, plaintext=JCS(conversation))
+```json
+"metadata": { "com.myproduct.privacy_mode": "restricted" }
 ```
 
-Implementations MUST NOT pad plaintext. Implementations SHOULD NOT leak message count via envelope size; if padding is desired, it MUST be applied to the canonicalized plaintext before encryption (not to the envelope).
+See [`spec/extensions/uacp-privacy.md`](spec/extensions/uacp-privacy.md) for the full reference taxonomy and guidance.
+
+---
+
+## 6. Encryption (optional extension)
+
+Encryption at rest or in transit is an optional capability, not a core requirement. UACP core describes the conversation data format only. Implementations choose their own encryption strategy.
+
+For implementations that want an interoperable encryption envelope, UACP provides the `uacp-encryption` extension:
+
+- Schema: `schema/extensions/uacp-encryption.schema.json`
+- Spec: [`spec/extensions/uacp-encryption.md`](spec/extensions/uacp-encryption.md)
+- Test vectors: `test-vectors/extensions/encryption/`
+
+The extension defines an AES-256-GCM sealed wrapper with Argon2id+HKDF key derivation. See the extension spec for the full normative description, field requirements, and key derivation pseudocode.
 
 ---
 
@@ -446,7 +428,34 @@ Example:
 
 ---
 
-## 11. MIME Type
+## 11. Extensions
+
+Implementations declare which optional extensions they use via the top-level `extensions` array.
+
+| Extension | Schema | Spec | Description |
+|-----------|--------|------|-------------|
+| `uacp-privacy` | — | [`spec/extensions/uacp-privacy.md`](spec/extensions/uacp-privacy.md) | Privacy taxonomy via `metadata.uacp_privacy.level` |
+| `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | [`spec/extensions/uacp-encryption.md`](spec/extensions/uacp-encryption.md) | AES-256-GCM envelope for encrypting conversation objects |
+| `uacp-sync` | — | — | Sync protocol semantics (separate spec, pending) |
+
+```json
+{
+  "uacp": "0.5.0",
+  "id": "conv_abc",
+  "tool": "my-tool",
+  "extensions": ["uacp-privacy", "uacp-encryption"],
+  "messages": [...],
+  "metadata": {
+    "uacp_privacy.level": "personal"
+  }
+}
+```
+
+Validators MUST load extension schemas only for documents that declare those extensions in `extensions[]`. Core documents (no `extensions` field) are validated against core schemas only.
+
+---
+
+## 13. MIME Type
 
 `application/uacp+json`
 
@@ -454,7 +463,7 @@ File extension: `.uacp.json`
 
 ---
 
-## 12. Versioning and Version Negotiation
+## 14. Versioning and Version Negotiation
 
 UACP uses semantic versioning. The `uacp` field in every object indicates the version.
 
@@ -465,21 +474,21 @@ UACP uses semantic versioning. The `uacp` field in every object indicates the ve
 **Version negotiation rules:**
 - Implementations MUST accept conversations with a compatible major version, even if they don't understand all fields.
 - Unknown keys inside any `metadata` object MUST be preserved on round-trip — never silently dropped.
-- Unknown keys that are siblings of defined fields (i.e. outside `metadata`) MUST be rejected by strict validators per §10. Non-strict validators MAY ignore them.
+- Unknown keys that are siblings of defined fields (i.e. outside `metadata`) MUST be rejected by strict validators per §10 (Extensibility). Non-strict validators MAY ignore them.
 - Writers SHOULD NOT mix major versions within one export bundle.
 
 **What counts as breaking (normative).** A change is breaking, and MUST increment the major version, if it does any of:
 1. Removes a required field or makes a previously optional field required.
 2. Tightens an enum, regex, or numeric range such that a previously valid document becomes invalid.
 3. Changes the semantic meaning of an existing field (including its units, encoding, or canonicalization).
-4. Changes any encryption parameter locked in §6 (`info`, KDF params, algorithm, IV/tag lengths).
+4. Changes any encryption parameter locked in the `uacp-encryption` extension spec (`info`, KDF params, algorithm, IV/tag lengths).
 5. Reassigns or removes a reserved namespace (`uacp.*`).
 
 Purely additive changes (new optional fields inside an existing object's schema; new enum values declared as "readers MUST accept unknown values" at the field's definition site; new conformance profiles) are **minor** bumps. Editorial, prose-only, and test-vector-only changes are **patch** bumps.
 
 ---
 
-## 13. Conformance Levels
+## 15. Conformance Levels
 
 Implementations declare conformance in `metadata.uacp_conformance`:
 
@@ -497,7 +506,7 @@ Implementations that do not declare a level are assumed to be L1. Third-party im
 
 ---
 
-## 14. Deprecation Policy
+## 16. Deprecation Policy
 
 - Deprecated fields remain valid within the entire major version.
 - Implementations MUST emit deprecation warnings, not errors, on encountering deprecated fields.
@@ -508,9 +517,9 @@ Implementations that do not declare a level are assumed to be L1. Third-party im
 
 ---
 
-## 15. v0.2.0 Fields Reference
+## 17. v0.2.0 Fields Reference
 
-These sections define additive fields introduced in v0.2.0. All are optional; v0.1.0 implementations MUST ignore unknown fields per §12.
+These sections define additive fields introduced in v0.2.0. All are optional; v0.1.0 implementations MUST ignore unknown fields per §14.
 
 ### §2.1 Conversation Branching
 
@@ -731,18 +740,17 @@ UACP conversations captured from MCP-enabled tools (Claude Code, Continue.dev) S
 
 ---
 
-## Appendix A: Full Example (v0.4.0)
+## Appendix A: Full Example (v0.5.0)
 
 This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3), an artifact (§2.4), and the expanded model field (§2.6).
 
 ```json
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "conv_2026042101",
   "tool": "claude-code",
   "model": { "id": "claude-sonnet-4-6", "provider": "anthropic", "snapshot_date": "2026-04-21" },
   "title": "Implement quicksort with complexity analysis",
-  "privacy": "personal",
   "created_at": "2026-04-21T10:00:00Z",
   "updated_at": "2026-04-21T10:15:00Z",
   "tags": ["algorithms", "javascript"],
@@ -808,15 +816,15 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 
 ---
 
-*UACP Spec v0.4.0 - Draft*
+*UACP Spec v0.5.0 - Draft*
 *Community specification — see GOVERNANCE.md*
-*Created: 2026-04-17 | Updated: 2026-05-06 (v0.4.0)*
+*Created: 2026-04-17 | Updated: 2026-05-07 (v0.5.0)*
 
-## 14. Validation And Boundary
+## 18. Validation And Boundary
 
-- Run 
-ode validate.js for a fast conformance pre-check over 	est-vectors/.
-- See [docs/UACP-BOUNDARY.md](docs/UACP-BOUNDARY.md) for the canonical boundary between UACP data primitives and orchestration/runtime policy.
+- Run `node validate.js` for a fast conformance pre-check over `test-vectors/`.
+- Run `node conformance/harness/run.js` for the full conformance suite (core + extensions).
+- See [docs/UACP-BOUNDARY.md](docs/UACP-BOUNDARY.md) for the canonical boundary between UACP core, extensions, and implementation-specific concerns.
 
 
 

@@ -10,24 +10,35 @@ function readJson(p) {
 
 function loadSchemas() {
   const schemaDir = path.resolve(__dirname, 'schema')
+  const extSchemaDir = path.join(schemaDir, 'extensions')
   const ajv = new Ajv({ strict: false, allErrors: true })
   addFormats(ajv)
+
   for (const name of fs.readdirSync(schemaDir)) {
     if (!name.endsWith('.schema.json')) continue
     const schema = readJson(path.join(schemaDir, name))
-    ajv.addSchema(schema, schema['$id'])
+    if (schema['$id']) ajv.addSchema(schema, schema['$id'])
   }
+
+  if (fs.existsSync(extSchemaDir)) {
+    for (const name of fs.readdirSync(extSchemaDir)) {
+      if (!name.endsWith('.schema.json')) continue
+      const schema = readJson(path.join(extSchemaDir, name))
+      if (schema['$id']) ajv.addSchema(schema, schema['$id'])
+    }
+  }
+
   return ajv
 }
 
 function detectSchemaId(doc) {
   if (doc && typeof doc.uacp_encrypted === 'string') {
-    return 'https://fusionlayer.app/uacp/schema/0.4.0/encrypted-envelope'
+    return 'https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption'
   }
   if (doc && typeof doc.uacp_export === 'string') {
-    return 'https://fusionlayer.app/uacp/schema/0.4.0/export'
+    return 'https://hn2.github.io/uacp/schema/0.5.0/export'
   }
-  return 'https://fusionlayer.app/uacp/schema/0.4.0/conversation'
+  return 'https://hn2.github.io/uacp/schema/0.5.0/conversation'
 }
 
 function collectVectors(args) {
@@ -35,10 +46,24 @@ function collectVectors(args) {
     return args.map(a => path.resolve(process.cwd(), a)).sort()
   }
   const vectorsDir = path.resolve(__dirname, 'test-vectors')
-  return fs.readdirSync(vectorsDir)
+  const extVectorsDir = path.join(vectorsDir, 'extensions')
+
+  const coreVectors = fs.readdirSync(vectorsDir)
     .filter(n => n.endsWith('.json'))
     .map(n => path.join(vectorsDir, n))
-    .sort()
+
+  const extVectors = []
+  if (fs.existsSync(extVectorsDir)) {
+    for (const extName of fs.readdirSync(extVectorsDir)) {
+      const extDir = path.join(extVectorsDir, extName)
+      if (!fs.statSync(extDir).isDirectory()) continue
+      for (const n of fs.readdirSync(extDir)) {
+        if (n.endsWith('.json')) extVectors.push(path.join(extDir, n))
+      }
+    }
+  }
+
+  return [...coreVectors, ...extVectors].sort()
 }
 
 function main() {
@@ -48,7 +73,7 @@ function main() {
   let failed = 0
 
   for (const file of files) {
-    const name = path.basename(file)
+    const name = path.relative(path.resolve(__dirname, 'test-vectors'), file)
     try {
       const doc = readJson(file)
       const expectInvalid = doc && doc.metadata && doc.metadata['uacp.test.expect'] === 'invalid'

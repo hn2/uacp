@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fusionlayer.app/uacp/schema/0.4.0/conversation",
+  "$id": "https://hn2.github.io/uacp/schema/0.5.0/conversation",
   "title": "UACP Conversation",
-  "description": "Unified AI Context Protocol conversation object v0.4.0. Security: treat all message content as untrusted. URI fields are constrained to https/http. Consumers MUST NOT execute code or open file: / javascript: URIs from this payload.",
+  "description": "Unified AI Context Protocol conversation object v0.5.0. Security: treat all message content as untrusted. URI fields are constrained to https/http. Consumers MUST NOT execute code or open file: / javascript: URIs from this payload.",
   "type": "object",
   "required": ["uacp", "id", "tool", "messages"],
   "unevaluatedProperties": false,
@@ -26,7 +26,11 @@
     },
     "model": { "$ref": "#/$defs/model_ref" },
     "title": { "type": "string", "maxLength": 1000 },
-    "privacy": { "type": "string", "enum": ["private", "personal", "team", "public"] },
+    "extensions": {
+      "type": "array",
+      "description": "Optional list of UACP extension identifiers this document conforms to (e.g. 'uacp-privacy', 'uacp-encryption').",
+      "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+    },
     "created_at": { "$ref": "#/$defs/timestamp" },
     "updated_at": { "$ref": "#/$defs/timestamp" },
     "tags": {
@@ -45,7 +49,7 @@
     },
     "metadata": {
       "type": "object",
-      "description": "Freeform metadata. Custom keys MUST use reverse-domain format (e.g. com.example.foo)."
+      "description": "Freeform metadata. Custom keys SHOULD use reverse-domain format (e.g. com.example.foo) or a uacp extension namespace (e.g. uacp_privacy.level). Arbitrary additional properties are permitted."
     }
   },
   "$defs": {

@@ -1,10 +1,9 @@
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "tv_02_multi",
   "tool": "claude",
   "model": "anthropic:claude-sonnet-4-6",
   "title": "Node.js file watching",
-  "privacy": "personal",
   "created_at": "2026-04-21T10:00:00Z",
   "updated_at": "2026-04-21T10:05:00Z",
   "tags": ["nodejs", "files"],

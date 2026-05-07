@@ -1,9 +1,8 @@
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "tv_12_rtl_hebrew",
   "tool": "claude-ai",
   "title": "עברית — greeting",
-  "privacy": "personal",
   "created_at": "2026-04-24T08:00:00.000Z",
   "updated_at": "2026-04-24T08:00:05.000Z",
   "messages": [

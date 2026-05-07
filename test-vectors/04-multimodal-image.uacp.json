@@ -1,9 +1,8 @@
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "tv_04_image",
   "tool": "claude",
   "title": "Image analysis",
-  "privacy": "personal",
   "created_at": "2026-04-21T12:00:00Z",
   "updated_at": "2026-04-21T12:00:30Z",
   "messages": [

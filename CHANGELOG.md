@@ -1,5 +1,33 @@
 # UACP Changelog
 
+## v0.5.0 — 2026-05-07
+
+### BREAKING
+- Remove `privacy` enum from core conversation schema. Privacy taxonomy moved to optional `uacp-privacy` extension. Consumers using `doc.privacy` must migrate (see MIGRATION below).
+- Move encryption envelope from core to optional `uacp-encryption` extension. Schema moved from `schema/encrypted-envelope.schema.json` to `schema/extensions/uacp-encryption.schema.json`. The old path is kept as a `$ref` shim for backwards compatibility but is deprecated.
+- Schema `$id` URLs migrated from `fusionlayer.app` to `hn2.github.io/uacp` (placeholder; will move to neutral domain once purchased — see inkfold#76).
+
+### Added
+- `extensions[]` top-level array on conversation schema — optional list of UACP extension identifiers (e.g. `["uacp-privacy", "uacp-encryption"]`).
+- `spec/extensions/uacp-privacy.md` — privacy taxonomy as a reference extension with recommended `metadata.uacp_privacy.level` placement.
+- `spec/extensions/uacp-encryption.md` — AES-256-GCM envelope format as an optional extension spec.
+- `schema/extensions/uacp-encryption.schema.json` — extension schema for encrypted envelopes.
+- `test-vectors/extensions/privacy/` — extension test vectors for privacy classification.
+- `test-vectors/extensions/encryption/` — extension test vectors for encryption envelope.
+- `docs/UACP-BOUNDARY.md` updated with explicit three-tier examples: Core / Extension / Implementation-specific.
+- CONFORMANCE.md updated to layered model: L1/L2/L3 = core conformance levels; extensions declared separately.
+- validate.js and conformance harness updated to load extension schemas and collect extension test vectors.
+
+### MIGRATION
+- Implementations using `doc.privacy` MUST move to `doc.metadata.uacp_privacy.level` (if using the `uacp-privacy` extension) or a vendor-namespaced field (`doc.metadata."com.vendor.privacy_mode"`).
+- Encryption envelopes are still supported but require declaring conformance to the `uacp-encryption` extension.
+- Schema `$id` references: update from `https://fusionlayer.app/uacp/schema/0.4.0/...` to `https://hn2.github.io/uacp/schema/0.5.0/...`.
+
+### Changed
+- All test vectors bumped from `uacp: "0.3.0"` / `"0.4.0"` to `uacp: "0.5.0"`.
+- Export bundle test vector source changed from `"fusionlayer"` to `"my-tool"` (OSS scrub).
+- README restructured: §5 Privacy Levels replaced with extension pointer; §6 Encryption replaced with extension pointer; new §11 Extensions section added.
+
 ## [Unreleased] — 2026-05-06
 
 ### Changed

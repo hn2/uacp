@@ -23,18 +23,29 @@ const SCHEMA_DIR = path.join(REPO_ROOT, 'schema')
 function loadAjv() {
   const ajv = new Ajv({ strict: false, allErrors: true })
   addFormats(ajv)
+
   for (const name of fs.readdirSync(SCHEMA_DIR)) {
     if (!name.endsWith('.schema.json')) continue
     const schema = JSON.parse(fs.readFileSync(path.join(SCHEMA_DIR, name), 'utf8'))
-    ajv.addSchema(schema, schema['$id'])
+    if (schema['$id']) ajv.addSchema(schema, schema['$id'])
   }
+
+  const extSchemaDir = path.join(SCHEMA_DIR, 'extensions')
+  if (fs.existsSync(extSchemaDir)) {
+    for (const name of fs.readdirSync(extSchemaDir)) {
+      if (!name.endsWith('.schema.json')) continue
+      const schema = JSON.parse(fs.readFileSync(path.join(extSchemaDir, name), 'utf8'))
+      if (schema['$id']) ajv.addSchema(schema, schema['$id'])
+    }
+  }
+
   return ajv
 }
 
 function detectSchemaId(doc) {
-  if (doc && typeof doc.uacp_encrypted === 'string') return 'https://fusionlayer.app/uacp/schema/0.4.0/encrypted-envelope'
-  if (doc && typeof doc.uacp_export === 'string') return 'https://fusionlayer.app/uacp/schema/0.4.0/export'
-  return 'https://fusionlayer.app/uacp/schema/0.4.0/conversation'
+  if (doc && typeof doc.uacp_encrypted === 'string') return 'https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption'
+  if (doc && typeof doc.uacp_export === 'string') return 'https://hn2.github.io/uacp/schema/0.5.0/export'
+  return 'https://hn2.github.io/uacp/schema/0.5.0/conversation'
 }
 
 function validateDoc(ajv, doc) {
@@ -44,12 +55,12 @@ function validateDoc(ajv, doc) {
   return { valid, errors }
 }
 
-// L1–L3 vector sets per CONFORMANCE.md
+// L1–L3 vector sets per CONFORMANCE.md (core-only vectors; extension vectors run separately)
 const LEVEL_VECTORS = {
   L1: ['01-minimal-chat.uacp.json', '02-multi-message.uacp.json', '03-tool-use.uacp.json'],
   L2: ['04-multimodal-image.uacp.json', '05-branched-conversation.uacp.json', '06-with-artifacts.uacp.json'],
-  L3: ['07-extended-thinking.uacp.json', '08-with-citations.uacp.json', '09-privacy-levels.uacp.json',
-       '10-redacted-message.uacp.json', '11-invalid-version-field.uacp.json', '12-invalid-missing-messages.uacp.json'],
+  L3: ['07-extended-thinking.uacp.json', '08-with-citations.uacp.json', '09-encrypted-envelope.uacp.json',
+       '13-deep-branches.uacp.json', '14-tool-call-correlation.uacp.json', '15-redactions-and-metadata.uacp.json'],
 }
 
 async function runConformance({ level = 'L3', impl } = {}) {
@@ -62,11 +73,23 @@ async function runConformance({ level = 'L3', impl } = {}) {
   let passed = 0
   let failed = 0
 
-  // Run all 21 test vectors for self-test; use level subsets for external impl
-  const allVectors = fs.readdirSync(VECTORS_DIR).filter(n => n.endsWith('.json')).sort()
+  // Collect core vectors + extension vectors
+  const coreVectors = fs.readdirSync(VECTORS_DIR).filter(n => n.endsWith('.json')).sort()
+  const extVectors = []
+  const extVectorsBase = path.join(VECTORS_DIR, 'extensions')
+  if (fs.existsSync(extVectorsBase)) {
+    for (const extName of fs.readdirSync(extVectorsBase)) {
+      const extDir = path.join(extVectorsBase, extName)
+      if (!fs.statSync(extDir).isDirectory()) continue
+      for (const n of fs.readdirSync(extDir)) {
+        if (n.endsWith('.json')) extVectors.push(path.join(extDir, n))
+      }
+    }
+  }
+  const allVectors = [...coreVectors.map(n => path.join(VECTORS_DIR, n)), ...extVectors.sort()]
 
-  for (const filename of allVectors) {
-    const filePath = path.join(VECTORS_DIR, filename)
+  for (const filePath of allVectors) {
+    const filename = path.relative(VECTORS_DIR, filePath)
     let doc
     try {
       doc = JSON.parse(fs.readFileSync(filePath, 'utf8'))

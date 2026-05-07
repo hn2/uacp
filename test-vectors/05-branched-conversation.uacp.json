@@ -1,9 +1,8 @@
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "tv_05_branch",
   "tool": "chatgpt",
   "title": "Branched conversation",
-  "privacy": "personal",
   "created_at": "2026-04-21T13:00:00Z",
   "updated_at": "2026-04-21T13:05:00Z",
   "branches": ["msg_4_alt"],

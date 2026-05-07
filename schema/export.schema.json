@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fusionlayer.app/uacp/schema/0.4.0/export",
+  "$id": "https://hn2.github.io/uacp/schema/0.5.0/export",
   "title": "UACP Export Bundle",
   "description": "A collection of UACP Conversation Objects exported together.",
   "type": "object",
@@ -29,7 +29,7 @@
       "type": "array",
       "minItems": 0,
       "items": {
-        "$ref": "https://fusionlayer.app/uacp/schema/0.4.0/conversation"
+        "$ref": "https://hn2.github.io/uacp/schema/0.5.0/conversation"
       }
     },
     "metadata": { "type": "object" }

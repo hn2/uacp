@@ -1,9 +1,8 @@
 {
-  "uacp": "0.3.0",
+  "uacp": "0.5.0",
   "id": "tv_06_artifacts",
   "tool": "claude",
   "title": "Artifact generation",
-  "privacy": "personal",
   "created_at": "2026-04-21T14:00:00Z",
   "updated_at": "2026-04-21T14:01:00Z",
   "messages": [
