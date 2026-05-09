@@ -1,0 +1,18 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-reasoning-ext-invalid-tokens",
+  "tool": "claude",
+  "extensions": ["uacp-reasoning"],
+  "messages": [
+    {
+      "role": "assistant",
+      "content": [
+        { "type": "thinking", "text": "x", "tokens": -5 }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.reason": "thinking.tokens must be a non-negative integer"
+  }
+}

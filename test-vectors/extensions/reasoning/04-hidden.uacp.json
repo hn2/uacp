@@ -1,0 +1,16 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-reasoning-ext-004",
+  "tool": "openai",
+  "extensions": ["uacp-reasoning"],
+  "messages": [
+    { "role": "user", "content": "Hi" },
+    {
+      "role": "assistant",
+      "content": [
+        { "type": "thinking", "text": "User is greeting; respond simply.", "model_visibility": "hidden", "tokens": 0 },
+        { "type": "text", "text": "Hello!" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-reasoning-ext-003",
+  "tool": "openai",
+  "extensions": ["uacp-reasoning"],
+  "messages": [
+    { "role": "user", "content": "Solve 3x+7=22." },
+    {
+      "role": "assistant",
+      "content": [
+        { "type": "thinking", "text": "[redacted summary]", "model_visibility": "redacted" },
+        { "type": "text", "text": "x = 5" }
+      ]
+    }
+  ]
+}
