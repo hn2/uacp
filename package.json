@@ -1,10 +1,10 @@
 {
   "name": "uacp",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Unified AI Context Protocol — schema validator and test harness",
   "type": "commonjs",
   "scripts": {
-    "validate": "node validate.js test-vectors/*.json",
+    "validate": "node validate.js",
     "test": "node test/version-consistency.js && node validate.js && node conformance/harness/run.js"
   },
   "devDependencies": {

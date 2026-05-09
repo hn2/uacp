@@ -36,9 +36,9 @@ function detectSchemaId(doc) {
     return 'https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption'
   }
   if (doc && typeof doc.uacp_export === 'string') {
-    return 'https://hn2.github.io/uacp/schema/0.5.0/export'
+    return 'https://hn2.github.io/uacp/schema/0.6.0/export'
   }
-  return 'https://hn2.github.io/uacp/schema/0.5.0/conversation'
+  return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
 function collectVectors(args) {

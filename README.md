@@ -1,4 +1,4 @@
-# Unified AI Context Protocol (UACP) — Specification v0.5.0
+# Unified AI Context Protocol (UACP) — Specification v0.6.0
 
 **UACP Core v0.5.0 — vendor-neutral conversation format. Optional encryption envelope extension (`uacp-encryption`) for interoperable encrypted interchange.**
 
