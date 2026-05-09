@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-artifacts",
+  "title": "UACP Artifacts Extension",
+  "description": "Artifact version chain with lineage_id and previous_version_id. v0.3.4.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version number for this artifact within the conversation. Monotonically increasing per artifact_lineage_id."
+    },
+    "artifact_lineage_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Stable identifier shared across all versions of the same logical artifact."
+    },
+    "previous_version_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "id of the immediately prior artifact in the lineage. Absent for version 1; required for version > 1."
+    },
+    "immutable": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true, the artifact's content MUST NOT be edited in place; new versions create new ids."
+    }
+  }
+}

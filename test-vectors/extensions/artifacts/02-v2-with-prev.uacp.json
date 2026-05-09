@@ -1,0 +1,26 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-002",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "user", "content": "Circle." },
+    {
+      "role": "assistant",
+      "content": [{ "type": "artifact_ref", "id": "art-svg-1" }],
+      "artifacts": [
+        { "id": "art-svg-1", "type": "svg", "title": "circle.svg", "content": "<svg fill=\"blue\"/>",
+          "version": 1, "artifact_lineage_id": "lin-circle" }
+      ]
+    },
+    { "role": "user", "content": "Red." },
+    {
+      "role": "assistant",
+      "content": [{ "type": "artifact_ref", "id": "art-svg-2" }],
+      "artifacts": [
+        { "id": "art-svg-2", "type": "svg", "title": "circle.svg", "content": "<svg fill=\"red\"/>",
+          "version": 2, "artifact_lineage_id": "lin-circle", "previous_version_id": "art-svg-1" }
+      ]
+    }
+  ]
+}

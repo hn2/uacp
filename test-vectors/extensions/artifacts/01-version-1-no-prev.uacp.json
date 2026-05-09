@@ -1,0 +1,23 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-001",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "user", "content": "Make me a circle." },
+    {
+      "role": "assistant",
+      "content": [{ "type": "artifact_ref", "id": "art-svg-1" }],
+      "artifacts": [
+        {
+          "id": "art-svg-1",
+          "type": "svg",
+          "title": "circle.svg",
+          "content": "<svg/>",
+          "version": 1,
+          "artifact_lineage_id": "lin-circle"
+        }
+      ]
+    }
+  ]
+}
