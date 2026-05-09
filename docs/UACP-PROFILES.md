@@ -30,7 +30,6 @@ A field or rule belongs in core UACP **if and only if** it can be validated from
 | Message structure | branch topology, thread references |
 | Multimodal content | image/audio/file references and encoding |
 | Citation and grounding | `span`, `source_uri`, `confidence` |
-| Privacy signal | `privacy_mode` enum (`smart` / `private` / `incognito`) |
 | Schema validation constraints | required fields, type constraints, format rules |
 
 ### Belongs in a Profile
@@ -105,7 +104,7 @@ The table below shows how FusionLayer-specific fields map to the profile pattern
 
 | FusionLayer concept | Core UACP field | Profile field |
 |--------------------|-----------------|---------------|
-| Storage / sharing mode | `privacy_mode` (core — 3-value enum) | — |
+| Storage / sharing mode | — | `x-fusionlayer.privacy_mode` (product-specific; core has the optional `metadata.uacp_privacy.level` convention only) |
 | Active AI persona | — | `x-fusionlayer.persona_id` |
 | Vendor selection | — | `x-fusionlayer.routing_vendor` |
 | Cost per message | — | `x-fusionlayer.cost_usd` |

@@ -1,7 +1,5 @@
 export type UACPVersion = string
 
-export type PrivacyMode = 'private' | 'personal' | 'team' | 'public'
-
 export type MessageRole = 'user' | 'assistant' | 'system' | 'tool'
 
 export type MessageStatus = 'complete' | 'in_progress' | 'error'
@@ -122,7 +120,6 @@ export interface UACPDocument {
   tool: string
   model?: string
   title?: string
-  privacy?: PrivacyMode
   created_at?: string
   updated_at?: string
   messages: Message[]

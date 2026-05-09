@@ -73,19 +73,6 @@ describe('validate', () => {
     assert.ok(r.errors!.some(e => e.includes('role')))
   })
 
-  it('rejects invalid privacy value', () => {
-    const r = validate({ ...minimal, privacy: 'unknown' })
-    assert.equal(r.ok, false)
-    assert.ok(r.errors!.some(e => e.includes('privacy')))
-  })
-
-  it('accepts valid privacy values', () => {
-    for (const privacy of ['private', 'personal', 'team', 'public'] as const) {
-      const r = validate({ ...minimal, privacy })
-      assert.equal(r.ok, true, `privacy=${privacy} should be valid`)
-    }
-  })
-
   it('validates content blocks', () => {
     const r = validate({
       ...minimal,
@@ -495,7 +482,6 @@ describe('serialize', () => {
       id: 'round-trip-001',
       tool: 'test',
       title: 'Round-trip test',
-      privacy: 'personal',
       created_at: '2026-05-09T00:00:00Z',
       messages: [
         { role: 'user', content: 'Write a bubble sort function' },

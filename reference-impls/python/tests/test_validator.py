@@ -61,18 +61,6 @@ def test_validate_rejects_invalid_role():
     assert any('role' in e for e in r['errors'])
 
 
-def test_validate_accepts_valid_privacy_values():
-    for privacy in ('private', 'personal', 'team', 'public'):
-        r = validate({**MINIMAL, 'privacy': privacy})
-        assert r['ok'] is True, f'privacy={privacy} should be valid'
-
-
-def test_validate_rejects_invalid_privacy():
-    r = validate({**MINIMAL, 'privacy': 'unknown'})
-    assert r['ok'] is False
-    assert any('privacy' in e for e in r['errors'])
-
-
 def test_validate_content_blocks():
     r = validate({**MINIMAL, 'messages': [{'role': 'assistant', 'content': [
         {'type': 'text', 'text': 'Hello'},

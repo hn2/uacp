@@ -47,7 +47,7 @@ Implementations **should** prefer inline `thinking` content blocks (included in 
 
 ## Privacy note
 
-Reasoning content may contain sensitive intermediate analysis. Tools capturing this data **should** respect the user's privacy mode (per the `uacp-privacy` convention). Implementations that encrypt conversation content **must** include reasoning content in the encrypted body.
+Reasoning content may contain sensitive intermediate analysis. Tools capturing this data **should** respect the user's privacy classification (the optional `metadata.uacp_privacy.level` convention from README §10). Implementations that encrypt conversation content **must** include reasoning content in the encrypted body.
 
 ---
 

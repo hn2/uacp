@@ -5,7 +5,6 @@ SEMVER_RE = re.compile(r'^\d+\.\d+\.\d+$')
 ISO8601_RE = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$')
 SHA256_RE = re.compile(r'^[a-f0-9]{64}$')
 VALID_ROLES = {'user', 'assistant', 'system', 'tool'}
-VALID_PRIVACY = {'private', 'personal', 'team', 'public'}
 VALID_CONTENT_TYPES = {'text', 'image', 'file', 'code', 'thinking', 'artifact_ref', 'audio', 'video', 'pdf', 'latex'}
 VALID_ARTIFACT_TYPES = {'code', 'html', 'svg', 'markdown', 'react', 'text'}
 VALID_MSG_STATUS = {'complete', 'in_progress', 'error'}
@@ -13,7 +12,6 @@ VALID_PROVENANCE = {'extracted', 'inferred', 'system', 'tool_output'}
 VALID_ROOT_KEYS = {
     'uacp', 'id', 'tool', 'tool_chain', 'model', 'title', 'extensions',
     'created_at', 'updated_at', 'tags', 'project', 'branches', 'messages', 'metadata',
-    'privacy',
 }
 VALID_MSG_KEYS = {
     'id', 'parent_id', 'role', 'content', 'timestamp', 'model', 'tokens', 'status',
@@ -272,10 +270,6 @@ def validate(doc: object) -> dict:
     else:
         for i, msg in enumerate(messages):
             _validate_message(msg, i, errors)
-
-    privacy = doc.get('privacy')
-    if privacy is not None and privacy not in VALID_PRIVACY:
-        errors.append(f'privacy: must be one of {", ".join(sorted(VALID_PRIVACY))}')
 
     created_at = doc.get('created_at')
     if created_at is not None and not ISO8601_RE.match(created_at):
