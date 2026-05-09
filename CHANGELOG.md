@@ -1,5 +1,29 @@
 # UACP Changelog
 
+## [Unreleased] — v0.3 extension drafts
+
+### Added (extension specs)
+- `spec/extensions/uacp-branching.md` — conversation branching / non-linear tree (v0.3.1). Adds `branch_parent_id` and `branch_label` message fields.
+- `spec/extensions/uacp-reasoning.md` — reasoning/thinking blocks (v0.3.2). Documents `thinking` content block `model_visibility` + `tokens` fields and message-level `reasoning` object.
+- `spec/extensions/uacp-citations.md` — per-claim citations (v0.3.3). Documents full citation semantics including `source.retrieved_at`.
+- `spec/extensions/uacp-artifacts.md` — artifacts with versioning (v0.3.4). Documents `artifact.version` field.
+
+### Changed (schema v0.6.x patch)
+- `schema/conversation.schema.json`: message `branch_parent_id`, `branch_label` fields added.
+- `schema/conversation.schema.json`: `content_block` gains `model_visibility` (enum `visible|hidden`) and `tokens` (integer) for thinking blocks.
+- `schema/conversation.schema.json`: `artifact` gains `version` (integer ≥ 1).
+- `schema/conversation.schema.json`: `citation.source` gains `retrieved_at` (ISO 8601 timestamp).
+- `extensions[]` items corrected to string type (was incorrectly enforced as objects in TS validator).
+
+### Test vectors
+- Added vectors 56–63 covering branching (2), reasoning (2), citations (2), artifacts (2).
+- Conformance harness: 110 vectors (all passing).
+
+### Reference implementations
+- All three validators updated: TS 176/176, Python 130/130, Go passing.
+
+---
+
 ## v0.6.0 — 2026-05-09
 
 ### Removed
