@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fusionlayer-uacp"
-version = "0.6.0"
+version = "0.7.0"
 description = "Unified AI Context Protocol — Python reference validator"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.11"

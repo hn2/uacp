@@ -6,7 +6,7 @@ const addFormats = require('ajv-formats')
 const fs = require('node:fs')
 const path = require('node:path')
 
-const SCHEMA_ID = 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
+const SCHEMA_ID = 'https://hn2.github.io/uacp/schema/0.7.0/conversation'
 
 function loadValidator() {
   const ajv = new Ajv({ strict: false, allErrors: true })

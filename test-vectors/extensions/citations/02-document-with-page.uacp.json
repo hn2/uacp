@@ -1,0 +1,19 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-002",
+  "tool": "claude",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    { "role": "user", "content": "What does the manual say about errors?" },
+    {
+      "role": "assistant",
+      "content": "Errors are described in chapter 4.",
+      "citations": [
+        {
+          "source": { "kind": "document", "title": "Owner's Manual", "id": "doc-abc-001" },
+          "anchor": { "page": 42 }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-branch-ext-002",
+  "tool": "claude",
+  "extensions": ["uacp-branching"],
+  "messages": [
+    { "id": "m1", "role": "user", "content": "Write a haiku." },
+    { "id": "m2", "role": "assistant", "content": "first attempt", "branch_label": "attempt-1" },
+    { "id": "m3", "role": "assistant", "content": "second attempt", "branch_parent_id": "m1", "branch_label": "attempt-2" },
+    { "id": "m4", "role": "assistant", "content": "third attempt", "branch_parent_id": "m1", "branch_label": "attempt-3" }
+  ]
+}

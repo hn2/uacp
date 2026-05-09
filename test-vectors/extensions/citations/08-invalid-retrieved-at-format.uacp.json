@@ -1,0 +1,23 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-invalid-retrieved-format",
+  "tool": "perplexity",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "x",
+      "citations": [
+        {
+          "source": { "kind": "web", "url": "https://example.com" },
+          "retrieved_at": "yesterday",
+          "anchor": { "start": 0, "end": 1 }
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.reason": "retrieved_at must be RFC 3339 / ISO 8601 timestamp"
+  }
+}

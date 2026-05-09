@@ -1,0 +1,26 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-001",
+  "tool": "perplexity",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    { "role": "user", "content": "What is the speed of light?" },
+    {
+      "role": "assistant",
+      "content": "The speed of light in a vacuum is 299,792,458 metres per second.",
+      "citations": [
+        {
+          "source": {
+            "kind": "web",
+            "url": "https://physics.nist.gov/cgi-bin/cuu/Value?c",
+            "title": "NIST — Speed of light",
+            "publisher": "NIST"
+          },
+          "retrieved_at": "2026-05-09T12:00:00Z",
+          "anchor": { "start": 0, "end": 64 },
+          "confidence": 0.99
+        }
+      ]
+    }
+  ]
+}

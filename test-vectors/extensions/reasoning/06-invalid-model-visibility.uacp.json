@@ -1,0 +1,18 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-reasoning-ext-invalid-vis",
+  "tool": "claude",
+  "extensions": ["uacp-reasoning"],
+  "messages": [
+    {
+      "role": "assistant",
+      "content": [
+        { "type": "thinking", "text": "x", "model_visibility": "public" }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.reason": "model_visibility must be visible|hidden|redacted"
+  }
+}

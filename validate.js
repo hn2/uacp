@@ -36,9 +36,9 @@ function detectSchemaId(doc) {
     return 'https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption'
   }
   if (doc && typeof doc.uacp_export === 'string') {
-    return 'https://hn2.github.io/uacp/schema/0.6.0/export'
+    return 'https://hn2.github.io/uacp/schema/0.7.0/export'
   }
-  return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
+  return 'https://hn2.github.io/uacp/schema/0.7.0/conversation'
 }
 
 function collectVectors(args) {
@@ -72,10 +72,18 @@ function main() {
   let passed = 0
   let failed = 0
 
+  let skipped = 0
+
   for (const file of files) {
     const name = path.relative(path.resolve(__dirname, 'test-vectors'), file)
     try {
       const doc = readJson(file)
+      const scope = doc && doc.metadata && doc.metadata['uacp.test.scope']
+      if (scope === 'reference-impl') {
+        skipped += 1
+        console.log(`- ${name} (skipped — reference-impl scope)`)
+        continue
+      }
       const expectInvalid = doc && doc.metadata && doc.metadata['uacp.test.expect'] === 'invalid'
       const schemaId = detectSchemaId(doc)
       const valid = ajv.validate(schemaId, doc)
@@ -106,7 +114,7 @@ function main() {
     }
   }
 
-  console.log(`\nUACP validate: pass=${passed} fail=${failed}`)
+  console.log(`\nUACP validate: pass=${passed} fail=${failed} skipped=${skipped}`)
   process.exit(failed ? 1 : 0)
 }
 

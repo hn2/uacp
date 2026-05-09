@@ -1,0 +1,19 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-invalid-dangling",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "assistant", "content": "x",
+      "artifacts": [
+        { "id": "a2", "type": "code", "title": "f.py", "content": "v2",
+          "version": 2, "artifact_lineage_id": "lin-f", "previous_version_id": "ghost" }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "previous_version_id refers to a non-existent artifact"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-reasoning",
+  "title": "UACP Reasoning Extension",
+  "description": "Thinking content blocks for model reasoning. v0.3.2.",
+  "$defs": {
+    "thinking_block": {
+      "type": "object",
+      "required": ["type", "text"],
+      "properties": {
+        "type": { "const": "thinking" },
+        "text": {
+          "type": "string",
+          "maxLength": 1000000,
+          "description": "Reasoning content. May be empty. Hard limit: 1,000,000 Unicode codepoints."
+        },
+        "model_visibility": {
+          "type": "string",
+          "enum": ["visible", "hidden", "redacted"],
+          "default": "visible",
+          "description": "visible: model output included reasoning by default; hidden: reasoning was generated but vendor did not surface; redacted: vendor returned a redacted summary only."
+        },
+        "tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Token count for this thinking block (vendor-reported when available)."
+        }
+      }
+    }
+  }
+}

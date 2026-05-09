@@ -1,0 +1,24 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-invalid-lineage-mismatch",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "assistant", "content": "x",
+      "artifacts": [
+        { "id": "a1", "type": "code", "title": "f.py", "content": "v1", "version": 1, "artifact_lineage_id": "lin-A" }
+      ]
+    },
+    { "role": "assistant", "content": "x",
+      "artifacts": [
+        { "id": "a2", "type": "code", "title": "f.py", "content": "v2",
+          "version": 2, "artifact_lineage_id": "lin-B", "previous_version_id": "a1" }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "lineage_id mismatch between linked artifact versions"
+  }
+}

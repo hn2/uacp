@@ -1,0 +1,35 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-003",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "user", "content": "v1" },
+    { "role": "assistant", "content": "ok",
+      "artifacts": [
+        { "id": "a1", "type": "code", "title": "f.py", "content": "v1", "version": 1, "artifact_lineage_id": "lin-f" }
+      ]
+    },
+    { "role": "user", "content": "v2" },
+    { "role": "assistant", "content": "ok",
+      "artifacts": [
+        { "id": "a2", "type": "code", "title": "f.py", "content": "v2",
+          "version": 2, "artifact_lineage_id": "lin-f", "previous_version_id": "a1" }
+      ]
+    },
+    { "role": "user", "content": "v3" },
+    { "role": "assistant", "content": "ok",
+      "artifacts": [
+        { "id": "a3", "type": "code", "title": "f.py", "content": "v3",
+          "version": 3, "artifact_lineage_id": "lin-f", "previous_version_id": "a2" }
+      ]
+    },
+    { "role": "user", "content": "v4" },
+    { "role": "assistant", "content": "ok",
+      "artifacts": [
+        { "id": "a4", "type": "code", "title": "f.py", "content": "v4",
+          "version": 4, "artifact_lineage_id": "lin-f", "previous_version_id": "a3", "immutable": true }
+      ]
+    }
+  ]
+}

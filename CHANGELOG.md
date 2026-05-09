@@ -1,26 +1,27 @@
 # UACP Changelog
 
-## [Unreleased] — v0.3 extension drafts
+## v0.7.0 — 2026-05-10
 
-### Added (extension specs)
-- `spec/extensions/uacp-branching.md` — conversation branching / non-linear tree (v0.3.1). Adds `branch_parent_id` and `branch_label` message fields.
-- `spec/extensions/uacp-reasoning.md` — reasoning/thinking blocks (v0.3.2). Documents `thinking` content block `model_visibility` + `tokens` fields and message-level `reasoning` object.
-- `spec/extensions/uacp-citations.md` — per-claim citations (v0.3.3). Documents full citation semantics including `source.retrieved_at`.
-- `spec/extensions/uacp-artifacts.md` — artifacts with versioning (v0.3.4). Documents `artifact.version` field.
+### Added — extensions promoted from draft to available
+- `uacp-branching` (v0.3.1) — conversation branching extension. L3 (additive). Adds optional `branch_parent_id` and `branch_label` fields to messages with referential-integrity, no-self-reference, no-cycle, and label-length validation rules. Schema: `schema/extensions/uacp-branching.schema.json`. Spec: `spec/extensions/uacp-branching.md`. Test vectors: `test-vectors/extensions/branching/`.
+- `uacp-reasoning` (v0.3.2) — reasoning blocks extension. L3 (additive). `thinking` content block with `text` (≤ 1,000,000 codepoints), `model_visibility` enum (`visible|hidden|redacted`), and `tokens` (integer ≥ 0). Schema: `schema/extensions/uacp-reasoning.schema.json`. Spec: `spec/extensions/uacp-reasoning.md`. Test vectors: `test-vectors/extensions/reasoning/`.
+- `uacp-citations` (v0.3.3) — per-claim citations extension. L3 (additive). `source.kind` enum (`web|document|vector_store|tool_result|user_attachment`), `retrieved_at` (RFC 3339, required when `kind=web`), `anchor` (oneOf: `start+end` codepoint offsets, `selector`, or `page`), `confidence` (0–1). Schema: `schema/extensions/uacp-citations.schema.json`. Spec: `spec/extensions/uacp-citations.md`. Test vectors: `test-vectors/extensions/citations/`.
+- `uacp-artifacts` (v0.3.4) — artifact version-chain extension. L3 (additive). `version` (integer ≥ 1, monotonic per lineage), `artifact_lineage_id` (stable ID), `previous_version_id` (required when `version > 1`), `immutable` (boolean). Schema: `schema/extensions/uacp-artifacts.schema.json`. Spec: `spec/extensions/uacp-artifacts.md`. Test vectors: `test-vectors/extensions/artifacts/`.
 
-### Changed (schema v0.6.x patch)
-- `schema/conversation.schema.json`: message `branch_parent_id`, `branch_label` fields added.
-- `schema/conversation.schema.json`: `content_block` gains `model_visibility` (enum `visible|hidden`) and `tokens` (integer) for thinking blocks.
-- `schema/conversation.schema.json`: `artifact` gains `version` (integer ≥ 1).
-- `schema/conversation.schema.json`: `citation.source` gains `retrieved_at` (ISO 8601 timestamp).
-- `extensions[]` items corrected to string type (was incorrectly enforced as objects in TS validator).
+### Changed — core schema (additive only)
+- `message.branch_label` maxLength bumped from 128 to 256 to match `uacp-branching` spec.
+- `content_block.model_visibility` enum gains `redacted` (was `visible|hidden`).
+- `citation` object: now accepts either core form (`span` + `source.url`) or extension form (`anchor` + `source.kind`). `source` gains optional `kind`, `publisher`, `id` fields. `citation` gains optional `anchor`, `retrieved_at`, `confidence` fields.
+- `artifact` object: gains optional `artifact_lineage_id`, `previous_version_id`, `immutable` fields.
 
 ### Test vectors
-- Added vectors 56–63 covering branching (2), reasoning (2), citations (2), artifacts (2).
-- Conformance harness: 110 vectors (all passing).
+- New extension vectors per directory: `branching/` (7), `reasoning/` (7), `citations/` (8), `artifacts/` (7).
+- Validator harnesses (`validate.js`, `conformance/harness/run.js`) honor the `metadata."uacp.test.scope"` hint; vectors marked `reference-impl` are skipped by the schema-only harness (referential / cyclic / chain checks live in the reference implementations).
 
 ### Reference implementations
-- All three validators updated: TS 176/176, Python 130/130, Go passing.
+- TypeScript: 229 tests passing (`reference-impls/typescript`). New modules under `src/extensions/{branching,reasoning,citations,artifacts}.ts`.
+- Python: 183 tests passing (`reference-impls/python`). New modules under `uacp/extensions/{branching,reasoning,citations,artifacts}.py`.
+- Go: validators added under `uacp/extensions/{branching,reasoning,citations,artifacts}.go`. Tests in `uacp/extensions/extensions_test.go`. (Local `go test` not run — Go toolchain unavailable on dev machine; CI runs on push.)
 
 ---
 

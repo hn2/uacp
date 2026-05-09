@@ -1,7 +1,21 @@
 # UACP Profiles and Implementation Adapters
 
-**Status:** Normative guidance  
+**Status:** Normative guidance
 **Scope:** Clarifies the boundary between core UACP and product-specific extensions
+
+---
+
+## Extension conformance declarations
+
+| Extension | Conformance level | Notes |
+|---|---|---|
+| `uacp-encryption` | L3 (additive) | Required only for implementations that emit encrypted envelopes. |
+| `uacp-branching` | L3 (additive) | Consumers without extension support MAY treat fields as opaque. |
+| `uacp-reasoning` | L3 (additive) | Consumers without extension support MAY skip `thinking` blocks. |
+| `uacp-citations` | L3 (additive) | Core `citations` form (`span` + `source.url`) remains valid alongside the extension form (`anchor` + `source.kind`). |
+| `uacp-artifacts` | L3 (additive) | Core `artifact` object remains valid without extension fields. |
+
+All v0.3 extensions are additive: a document that uses extension fields without declaring the extension in `extensions[]` is still valid against core UACP. Consumers MAY ignore extension fields without crashing.
 
 ---
 

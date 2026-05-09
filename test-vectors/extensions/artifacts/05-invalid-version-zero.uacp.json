@@ -1,0 +1,17 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-invalid-zero",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "assistant", "content": "x",
+      "artifacts": [
+        { "id": "a1", "type": "code", "title": "f.py", "content": "v0", "version": 0, "artifact_lineage_id": "lin-f" }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.reason": "version must be >= 1"
+  }
+}

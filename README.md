@@ -1,4 +1,4 @@
-# Unified AI Context Protocol (UACP) — Specification v0.6.0
+# Unified AI Context Protocol (UACP) — Specification v0.7.0
 
 **UACP Core v0.5.0 — vendor-neutral conversation format. Optional encryption envelope extension (`uacp-encryption`) for interoperable encrypted interchange.**
 
@@ -447,6 +447,10 @@ Implementations declare which optional extensions they use via the top-level `ex
 | Extension | Schema | Spec | Description |
 |-----------|--------|------|-------------|
 | `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | [`spec/extensions/uacp-encryption.md`](spec/extensions/uacp-encryption.md) | AES-256-GCM envelope for encrypting conversation objects |
+| `uacp-branching` | `schema/extensions/uacp-branching.schema.json` | [`spec/extensions/uacp-branching.md`](spec/extensions/uacp-branching.md) | Conversation branching (regenerations, edits) via `branch_parent_id` and `branch_label` on messages |
+| `uacp-reasoning` | `schema/extensions/uacp-reasoning.schema.json` | [`spec/extensions/uacp-reasoning.md`](spec/extensions/uacp-reasoning.md) | `thinking` content blocks with `model_visibility` (`visible|hidden|redacted`) and `tokens` |
+| `uacp-citations` | `schema/extensions/uacp-citations.schema.json` | [`spec/extensions/uacp-citations.md`](spec/extensions/uacp-citations.md) | Per-claim citations with `source.kind`, `retrieved_at`, and `anchor` (offsets, selector, or page) |
+| `uacp-artifacts` | `schema/extensions/uacp-artifacts.schema.json` | [`spec/extensions/uacp-artifacts.md`](spec/extensions/uacp-artifacts.md) | Artifact version chain via `version`, `artifact_lineage_id`, `previous_version_id`, `immutable` |
 
 ```json
 {

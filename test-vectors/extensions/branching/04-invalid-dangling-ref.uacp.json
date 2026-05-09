@@ -1,0 +1,16 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-branch-ext-invalid-dangling",
+  "tool": "chatgpt",
+  "extensions": ["uacp-branching"],
+  "messages": [
+    { "id": "m1", "role": "user", "content": "Hello" },
+    { "id": "m2", "role": "assistant", "content": "Hi there",
+      "branch_parent_id": "does-not-exist" }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "branch_parent_id references a non-existent message id"
+  }
+}

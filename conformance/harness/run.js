@@ -44,8 +44,8 @@ function loadAjv() {
 
 function detectSchemaId(doc) {
   if (doc && typeof doc.uacp_encrypted === 'string') return 'https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption'
-  if (doc && typeof doc.uacp_export === 'string') return 'https://hn2.github.io/uacp/schema/0.6.0/export'
-  return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
+  if (doc && typeof doc.uacp_export === 'string') return 'https://hn2.github.io/uacp/schema/0.7.0/export'
+  return 'https://hn2.github.io/uacp/schema/0.7.0/conversation'
 }
 
 function validateDoc(ajv, doc) {
@@ -107,6 +107,13 @@ async function runConformance({ level = 'L3', impl } = {}) {
     } catch (e) {
       results.push({ filename, pass: false, error: `parse error: ${e.message}` })
       failed++
+      continue
+    }
+
+    const scope = doc?.metadata?.['uacp.test.scope']
+    if (scope === 'reference-impl') {
+      results.push({ filename, pass: true, note: 'skipped — reference-impl scope' })
+      passed++
       continue
     }
 

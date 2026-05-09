@@ -1,7 +1,7 @@
 import { validate } from './validator.js'
 import type { UACPDocument } from './types.js'
 
-export const UACP_VERSION = '0.6.0'
+export const UACP_VERSION = '0.7.0'
 
 export function parse(json: string | object): UACPDocument {
   const doc = typeof json === 'string' ? JSON.parse(json) : json

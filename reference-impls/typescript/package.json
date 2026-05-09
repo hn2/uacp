@@ -1,6 +1,6 @@
 {
   "name": "@fusionlayer/uacp",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Unified AI Context Protocol — reference TypeScript validator and serializer",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/test/validator.test.js",
+    "test": "node --test dist/test/validator.test.js dist/test/extensions.test.js",
     "prepare": "npm run build"
   },
   "license": "Apache-2.0",

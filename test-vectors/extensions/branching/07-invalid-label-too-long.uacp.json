@@ -1,0 +1,25 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-branch-ext-invalid-label",
+  "tool": "chatgpt",
+  "extensions": [
+    "uacp-branching"
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "id": "m2",
+      "role": "assistant",
+      "content": "Hello",
+      "branch_label": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.reason": "branch_label exceeds 256 character limit"
+  }
+}

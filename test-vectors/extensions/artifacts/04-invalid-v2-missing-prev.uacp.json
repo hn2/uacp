@@ -1,0 +1,23 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-artifact-ext-invalid-v2-missing-prev",
+  "tool": "claude",
+  "extensions": ["uacp-artifacts"],
+  "messages": [
+    { "role": "assistant", "content": "x",
+      "artifacts": [
+        { "id": "a1", "type": "code", "title": "f.py", "content": "v1", "version": 1, "artifact_lineage_id": "lin-f" }
+      ]
+    },
+    { "role": "assistant", "content": "x",
+      "artifacts": [
+        { "id": "a2", "type": "code", "title": "f.py", "content": "v2", "version": 2, "artifact_lineage_id": "lin-f" }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "version 2 must have previous_version_id"
+  }
+}
