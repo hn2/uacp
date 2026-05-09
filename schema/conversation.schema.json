@@ -51,7 +51,8 @@
     },
     "metadata": {
       "type": "object",
-      "description": "Freeform metadata. Custom keys SHOULD use reverse-domain format (e.g. com.example.foo) or a uacp extension namespace (e.g. uacp_privacy.level). Arbitrary additional properties are permitted."
+      "maxProperties": 64,
+      "description": "Freeform metadata. Custom keys SHOULD use reverse-domain format (e.g. com.example.foo) or a uacp extension namespace (e.g. uacp_privacy.level). Arbitrary additional properties are permitted. Implementations MAY reject metadata nesting deeper than 8 levels."
     }
   },
   "$defs": {
@@ -125,7 +126,7 @@
           "items": { "$ref": "#/$defs/artifact" }
         },
         "redactions": { "$ref": "#/$defs/redactions" },
-        "metadata": { "type": "object" },
+        "metadata": { "type": "object", "maxProperties": 64 },
         "provenance": {
           "type": "string",
           "enum": ["extracted", "inferred", "system", "tool_output"],
@@ -235,7 +236,7 @@
         "mime_type": { "type": "string", "maxLength": 128 },
         "size_bytes": { "type": "integer", "minimum": 0 },
         "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
-        "data": { "type": "string", "contentEncoding": "base64", "maxLength": 16777216 },
+        "data": { "type": "string", "contentEncoding": "base64", "maxLength": 67108864 },
         "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
       }
     },
