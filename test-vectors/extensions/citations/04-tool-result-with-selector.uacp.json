@@ -1,0 +1,19 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-004",
+  "tool": "claude",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    { "role": "user", "content": "Search this page for the price." },
+    {
+      "role": "assistant",
+      "content": "The price is $19.99.",
+      "citations": [
+        {
+          "source": { "kind": "tool_result", "id": "search-result-7" },
+          "anchor": { "selector": "#section-2 > p:nth-child(3)" }
+        }
+      ]
+    }
+  ]
+}

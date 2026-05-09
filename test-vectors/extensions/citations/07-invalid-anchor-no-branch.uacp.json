@@ -1,0 +1,22 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-invalid-anchor",
+  "tool": "claude",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "hi",
+      "citations": [
+        {
+          "source": { "kind": "document", "id": "d" },
+          "anchor": {}
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.reason": "anchor must satisfy oneOf (start+end | selector | page)"
+  }
+}

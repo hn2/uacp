@@ -1,0 +1,23 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-invalid-end-before",
+  "tool": "claude",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "hello world",
+      "citations": [
+        {
+          "source": { "kind": "document", "id": "doc-1" },
+          "anchor": { "start": 5, "end": 1 }
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "anchor.end must be >= anchor.start"
+  }
+}

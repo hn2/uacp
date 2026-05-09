@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-citations",
+  "title": "UACP Citations Extension",
+  "description": "Per-claim citations with source kinds, retrieval timestamp, and span/selector/page anchors. v0.3.3.",
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "required": ["source", "anchor"],
+      "properties": {
+        "source": {
+          "type": "object",
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["web", "document", "vector_store", "tool_result", "user_attachment"]
+            },
+            "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
+            "title": { "type": "string", "maxLength": 1024 },
+            "publisher": { "type": "string", "maxLength": 256 },
+            "id": { "type": "string", "maxLength": 256 }
+          }
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC3339 timestamp when source content was retrieved by the model/tool. REQUIRED when source.kind is 'web'."
+        },
+        "anchor": {
+          "type": "object",
+          "description": "Where in the cited message text this citation applies. Unicode codepoint offsets, CSS selector, or page number.",
+          "oneOf": [
+            {
+              "required": ["start", "end"],
+              "properties": {
+                "start": { "type": "integer", "minimum": 0 },
+                "end": { "type": "integer", "minimum": 0 }
+              }
+            },
+            { "required": ["selector"], "properties": { "selector": { "type": "string", "minLength": 1, "maxLength": 1024 } } },
+            { "required": ["page"], "properties": { "page": { "type": "integer", "minimum": 1 } } }
+          ]
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

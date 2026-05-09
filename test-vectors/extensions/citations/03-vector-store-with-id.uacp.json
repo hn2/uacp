@@ -1,0 +1,19 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-003",
+  "tool": "openai",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    { "role": "user", "content": "Pull from notes." },
+    {
+      "role": "assistant",
+      "content": "Per your notes, the meeting is at 3pm.",
+      "citations": [
+        {
+          "source": { "kind": "vector_store", "id": "vs-meetings-2026", "title": "meetings.md" },
+          "anchor": { "start": 0, "end": 38 }
+        }
+      ]
+    }
+  ]
+}

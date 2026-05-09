@@ -1,0 +1,23 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-citation-ext-invalid-web-missing-retrieved",
+  "tool": "perplexity",
+  "extensions": ["uacp-citations"],
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "x",
+      "citations": [
+        {
+          "source": { "kind": "web", "url": "https://example.com" },
+          "anchor": { "start": 0, "end": 1 }
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "retrieved_at is required when source.kind is web"
+  }
+}
