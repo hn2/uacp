@@ -28,7 +28,7 @@
     "title": { "type": "string", "maxLength": 1000 },
     "extensions": {
       "type": "array",
-      "description": "Optional list of UACP extension identifiers this document conforms to (e.g. 'uacp-privacy', 'uacp-encryption').",
+      "description": "Optional list of UACP extension identifiers this document conforms to (e.g. 'uacp-encryption').",
       "items": { "type": "string", "minLength": 1, "maxLength": 128 }
     },
     "created_at": { "$ref": "#/$defs/timestamp" },

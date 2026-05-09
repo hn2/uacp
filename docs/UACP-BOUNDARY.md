@@ -45,21 +45,18 @@ defined in `spec/extensions/` and may have schemas in `schema/extensions/`.
 A document declares which extensions it uses via the top-level `extensions` array:
 
 ```json
-{ "extensions": ["uacp-privacy", "uacp-encryption"] }
+{ "extensions": ["uacp-encryption"] }
 ```
 
 **What is an extension:**
 
 | Extension | What it adds |
 |-----------|-------------|
-| `uacp-privacy` | Privacy level classification via `metadata.uacp_privacy.level`. Reference taxonomy: `private`, `personal`, `team`, `public`. |
 | `uacp-encryption` | AES-256-GCM envelope wrapping a conversation for at-rest/in-transit encryption. |
-| `uacp-sync` | Sync protocol semantics for multi-device synchronization. |
 
 **Rule:** an extension adds meaning or structure that is useful to many implementations but not required by all. It MUST NOT leak into core.
 
 **Examples of extension test vectors:**
-- `test-vectors/extensions/privacy/01-privacy-level-in-metadata.uacp.json`
 - `test-vectors/extensions/encryption/01-encrypted-envelope.uacp.json`
 
 ---
@@ -111,7 +108,7 @@ Implementations place product-specific data in `metadata` using namespaced keys:
 ```
 
 - `uacp.*` — reserved for the UACP spec itself
-- `uacp_<extension>.*` — reserved for official UACP extensions (e.g. `uacp_privacy.*`)
+- `uacp_<extension>.*` — reserved for official UACP extensions (e.g. `uacp_encryption.*`). `uacp_privacy.*` is reserved by the privacy metadata convention (see README §10).
 - `com.vendor.*` — recommended pattern for vendor-specific fields
 - Bare `tool.key` patterns (e.g. `cursor.workspace`) — tolerated for legacy compat but reverse-domain preferred
 

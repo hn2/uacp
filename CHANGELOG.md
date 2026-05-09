@@ -1,5 +1,22 @@
 # UACP Changelog
 
+## v0.6.0 — 2026-05-09
+
+### Removed
+- `uacp-privacy` extension. Privacy classification is now documented as a
+  metadata convention (see README §10 "Privacy metadata convention"). The
+  metadata key `uacp_privacy.level` remains reserved with the same reference
+  taxonomy. Pre-beta cleanup; no back-compat shim.
+- `uacp-sync` extension placeholder. It was never specified. If sync semantics
+  are needed in the future, they will be specified at that time.
+
+### Changed
+- README §10 adds "Privacy metadata convention" subsection.
+- Extensions tables in README, CONFORMANCE, UACP-BOUNDARY now list only
+  `uacp-encryption`.
+
+---
+
 ## v0.5.0 — 2026-05-07
 
 ### BREAKING

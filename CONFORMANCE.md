@@ -17,8 +17,7 @@ implementations may additionally declare.
 | **L3** | Full     | L2 + branches; artifacts; thinking blocks; citations; multimodal; streaming status; redactions. MAY declare any extensions. |
 
 Extensions are declared separately. An implementation that supports
-`uacp-privacy` and `uacp-encryption` declares those extensions on top of its
-core level (e.g. "L2 + uacp-privacy + uacp-encryption").
+`uacp-encryption` declares it on top of its core level (e.g. "L2 + uacp-encryption").
 
 An implementation MAY claim the highest level it passes. Claims are verified by
 the harness in §3. Unverified claims are self-declared and carry no trust.
@@ -117,14 +116,12 @@ Provenance defaults are defined in the spec; they are **not enforced** by the sc
 
 | Extension ID | Schema | Spec | Description |
 |---|---|---|---|
-| `uacp-privacy` | — | `spec/extensions/uacp-privacy.md` | Privacy taxonomy via metadata |
 | `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | `spec/extensions/uacp-encryption.md` | AES-256-GCM envelope |
-| `uacp-sync` | — | — | Sync protocol semantics (separate spec, pending) |
 
 Implementations declare extensions via the top-level `extensions` array:
 
 ```json
-{ "extensions": ["uacp-privacy", "uacp-encryption"] }
+{ "extensions": ["uacp-encryption"] }
 ```
 
 ## 6. Verified implementations

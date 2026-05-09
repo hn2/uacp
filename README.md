@@ -1,6 +1,6 @@
 # Unified AI Context Protocol (UACP) — Specification v0.5.0
 
-**UACP Core v0.5.0 — vendor-neutral conversation format. Optional extensions add privacy taxonomy (`uacp-privacy`), encryption envelope (`uacp-encryption`), and sync protocol (`uacp-sync`).**
+**UACP Core v0.5.0 — vendor-neutral conversation format. Optional encryption envelope extension (`uacp-encryption`) for interoperable encrypted interchange.**
 
 
 Relationship and boundary guidance with ACP: [docs/ACP-UACP-RELATIONSHIP.md](docs/ACP-UACP-RELATIONSHIP.md)
@@ -30,8 +30,8 @@ UACP (Unified AI Context Protocol) is an open standard for representing, storing
 ### Non-Goals
 - Define encryption or transport (those are implementation choices — see `uacp-encryption` extension)
 - Replace tool-native formats (UACP is an interchange format)
-- Mandate real-time sync (sync is implementation-level — see `uacp-sync` extension)
-- Define any particular privacy model (that is implementation policy — see `uacp-privacy` extension)
+- Mandate real-time sync (sync is implementation-level)
+- Define any particular privacy model (that is implementation policy — see "Privacy metadata convention" in §10)
 
 ---
 
@@ -81,7 +81,7 @@ A UACP conversation is a JSON object:
 |-------|------|-------------|
 | `model` | string or object | AI model used — string (canonical) or `{ id, provider?, snapshot_date? }` (see §2.6) |
 | `title` | string | Conversation title/summary |
-| `extensions` | string[] | Optional list of UACP extension identifiers this document uses (e.g. `["uacp-privacy"]`) |
+| `extensions` | string[] | Optional list of UACP extension identifiers this document uses (e.g. `["uacp-encryption"]`) |
 | `created_at` | string | ISO 8601 timestamp |
 | `updated_at` | string | ISO 8601 timestamp |
 | `tags` | string[] | User-defined tags |
@@ -263,30 +263,29 @@ Custom tools use reverse-domain notation: `com.example.mytool`
 
 ---
 
-## 5. Privacy Levels (moved to extension)
-
-Privacy classification is an optional extension, not a core concern.
+## 5. Privacy Levels
 
 Different products have different privacy models. UACP core does not dictate any particular privacy taxonomy.
 
-To attach privacy metadata to a conversation, use the `uacp-privacy` extension:
+The metadata key `uacp_privacy.level` is reserved as a convention for an optional, vendor-neutral privacy classification label. Use it to attach a classification hint:
 
 ```json
 {
-  "extensions": ["uacp-privacy"],
   "metadata": {
     "uacp_privacy.level": "personal"
   }
 }
 ```
 
-Or use a vendor-namespaced field for product-specific semantics:
+Reference values: `private`, `personal`, `team`, `public`. Default when absent: `personal`.
+
+This is a **convention, not an extension** — implementations do not declare it in `extensions[]`. Implementations with product-specific privacy semantics SHOULD use a vendor namespace instead:
 
 ```json
 "metadata": { "com.myproduct.privacy_mode": "restricted" }
 ```
 
-See [`spec/extensions/uacp-privacy.md`](spec/extensions/uacp-privacy.md) for the full reference taxonomy and guidance.
+See §10 "Privacy metadata convention" for the full guidance.
 
 ---
 
@@ -426,6 +425,19 @@ Example:
 }
 ```
 
+### Privacy metadata convention
+
+The metadata key `uacp_privacy.level` is reserved for an optional, vendor-neutral
+privacy classification label. Reference values: `private`, `personal`, `team`,
+`public`. Default when absent: `personal`.
+
+This is a convention, not an extension — implementations do not declare it in
+`extensions[]`. Implementations with product-specific privacy semantics SHOULD
+use a vendor namespace (e.g. `com.fusionlayer.privacy_mode`) instead.
+
+Scope: classification only. Encryption is covered by the `uacp-encryption`
+extension. Access control and enforcement are implementation-specific.
+
 ---
 
 ## 11. Extensions
@@ -434,20 +446,15 @@ Implementations declare which optional extensions they use via the top-level `ex
 
 | Extension | Schema | Spec | Description |
 |-----------|--------|------|-------------|
-| `uacp-privacy` | — | [`spec/extensions/uacp-privacy.md`](spec/extensions/uacp-privacy.md) | Privacy taxonomy via `metadata.uacp_privacy.level` |
 | `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | [`spec/extensions/uacp-encryption.md`](spec/extensions/uacp-encryption.md) | AES-256-GCM envelope for encrypting conversation objects |
-| `uacp-sync` | — | — | Sync protocol semantics (separate spec, pending) |
 
 ```json
 {
   "uacp": "0.5.0",
   "id": "conv_abc",
   "tool": "my-tool",
-  "extensions": ["uacp-privacy", "uacp-encryption"],
-  "messages": [...],
-  "metadata": {
-    "uacp_privacy.level": "personal"
-  }
+  "extensions": ["uacp-encryption"],
+  "messages": [...]
 }
 ```
 

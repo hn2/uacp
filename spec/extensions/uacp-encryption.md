@@ -96,5 +96,5 @@ Encryption is not required for any conformance level. It is an opt-in capability
 
 - Schema: `schema/extensions/uacp-encryption.schema.json`
 - Test vectors: `test-vectors/extensions/encryption/`
-- Privacy classification: `spec/extensions/uacp-privacy.md`
+- Privacy classification: see "Privacy metadata convention" in README §10.
 - CONFORMANCE.md
