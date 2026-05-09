@@ -203,7 +203,7 @@ INVALID_VECTORS = {
 
 def _load_vector(filename):
     path = os.path.join(VECTORS_DIR, filename)
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         return json.load(f)
 
 
@@ -230,7 +230,7 @@ def test_valid_vector_passes(filename):
 @pytest.mark.parametrize('filename', _list_invalid_vectors())
 def test_invalid_vector_fails(filename):
     path = os.path.join(VECTORS_DIR, filename)
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         doc = json.load(f)
     result = validate(doc)
     assert result['ok'] is False, f'{filename} should be invalid but validate() returned ok=True'
