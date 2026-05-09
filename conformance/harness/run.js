@@ -73,7 +73,7 @@ async function runConformance({ level = 'L3', impl } = {}) {
   let passed = 0
   let failed = 0
 
-  // Collect core vectors + extension vectors
+  // Collect core vectors + extension vectors + explicit invalid vectors
   const coreVectors = fs.readdirSync(VECTORS_DIR).filter(n => n.endsWith('.json')).sort()
   const extVectors = []
   const extVectorsBase = path.join(VECTORS_DIR, 'extensions')
@@ -86,7 +86,18 @@ async function runConformance({ level = 'L3', impl } = {}) {
       }
     }
   }
-  const allVectors = [...coreVectors.map(n => path.join(VECTORS_DIR, n)), ...extVectors.sort()]
+  const invalidVectors = []
+  const invalidVectorsBase = path.join(VECTORS_DIR, 'invalid')
+  if (fs.existsSync(invalidVectorsBase)) {
+    for (const n of fs.readdirSync(invalidVectorsBase)) {
+      if (n.endsWith('.json')) invalidVectors.push(path.join(invalidVectorsBase, n))
+    }
+  }
+  const allVectors = [
+    ...coreVectors.map(n => path.join(VECTORS_DIR, n)),
+    ...extVectors.sort(),
+    ...invalidVectors.sort(),
+  ]
 
   for (const filePath of allVectors) {
     const filename = path.relative(VECTORS_DIR, filePath)
