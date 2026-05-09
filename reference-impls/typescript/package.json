@@ -1,0 +1,40 @@
+{
+  "name": "@fusionlayer/uacp",
+  "version": "0.6.0",
+  "description": "Unified AI Context Protocol — reference TypeScript validator and serializer",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/test/validator.test.js",
+    "prepare": "npm run build"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hn2/uacp"
+  },
+  "keywords": [
+    "uacp",
+    "ai",
+    "context",
+    "protocol",
+    "llm",
+    "conversation"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "typescript": "^5.4.0"
+  }
+}
