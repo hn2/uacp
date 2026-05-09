@@ -1,0 +1,16 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-branch-ext-invalid-self",
+  "tool": "chatgpt",
+  "extensions": ["uacp-branching"],
+  "messages": [
+    { "id": "m1", "role": "user", "content": "Hello" },
+    { "id": "m2", "role": "assistant", "content": "self ref",
+      "branch_parent_id": "m2" }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "branch_parent_id points at the message's own id"
+  }
+}

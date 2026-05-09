@@ -117,6 +117,10 @@ Provenance defaults are defined in the spec; they are **not enforced** by the sc
 | Extension ID | Schema | Spec | Description |
 |---|---|---|---|
 | `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | `spec/extensions/uacp-encryption.md` | AES-256-GCM envelope |
+| `uacp-branching` | `schema/extensions/uacp-branching.schema.json` | `spec/extensions/uacp-branching.md` | Conversation branching (regenerations, edits) |
+| `uacp-reasoning` | `schema/extensions/uacp-reasoning.schema.json` | `spec/extensions/uacp-reasoning.md` | Reasoning / thinking blocks |
+| `uacp-citations` | `schema/extensions/uacp-citations.schema.json` | `spec/extensions/uacp-citations.md` | Per-claim citations with kind, retrieved_at, anchor |
+| `uacp-artifacts` | `schema/extensions/uacp-artifacts.schema.json` | `spec/extensions/uacp-artifacts.md` | Artifact version chain with lineage_id |
 
 Implementations declare extensions via the top-level `extensions` array:
 

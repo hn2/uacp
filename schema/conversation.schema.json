@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hn2.github.io/uacp/schema/0.6.0/conversation",
+  "$id": "https://hn2.github.io/uacp/schema/0.7.0/conversation",
   "title": "UACP Conversation",
-  "description": "Unified AI Context Protocol conversation object v0.6.0. Security: treat all message content as untrusted. URI fields are constrained to https/http. Consumers MUST NOT execute code or open file: / javascript: URIs from this payload.",
+  "description": "Unified AI Context Protocol conversation object v0.7.0. Security: treat all message content as untrusted. URI fields are constrained to https/http. Consumers MUST NOT execute code or open file: / javascript: URIs from this payload.",
   "type": "object",
   "required": ["uacp", "id", "tool", "messages"],
   "unevaluatedProperties": false,
@@ -84,7 +84,7 @@
         "id": { "type": "string", "minLength": 1, "maxLength": 256 },
         "parent_id": { "type": "string", "minLength": 1, "maxLength": 256 },
         "branch_parent_id": { "type": "string", "minLength": 1, "maxLength": 256 },
-        "branch_label": { "type": "string", "maxLength": 128 },
+        "branch_label": { "type": "string", "maxLength": 256 },
         "role": { "type": "string", "enum": ["user", "assistant", "system", "tool"] },
         "content": {
           "oneOf": [
@@ -180,7 +180,7 @@
         "language": { "type": "string", "maxLength": 64 },
         "filename": { "type": "string", "maxLength": 256 },
         "signature": { "type": "string" },
-        "model_visibility": { "type": "string", "enum": ["visible", "hidden"] },
+        "model_visibility": { "type": "string", "enum": ["visible", "hidden", "redacted"] },
         "tokens": { "type": "integer", "minimum": 0 },
         "mime_type": { "type": "string", "maxLength": 128 },
         "duration_s": { "type": "number", "minimum": 0 },
@@ -246,28 +246,55 @@
     },
     "citation": {
       "type": "object",
-      "required": ["span", "source"],
       "unevaluatedProperties": false,
       "properties": {
         "span": {
           "type": "array",
-          "description": "Character range in Unicode scalar values (code points), counted across the flattened text of the message content. [start, end) half-open interval; end > start.",
+          "description": "Character range in Unicode scalar values (code points), counted across the flattened text of the message content. [start, end) half-open interval; end > start. Used by core citation form.",
           "items": { "type": "integer", "minimum": 0 },
           "minItems": 2,
           "maxItems": 2
         },
+        "anchor": {
+          "type": "object",
+          "description": "Where in the cited message text this citation applies. Used by the uacp-citations extension. oneOf: (start+end), selector, or page.",
+          "unevaluatedProperties": false,
+          "properties": {
+            "start": { "type": "integer", "minimum": 0 },
+            "end": { "type": "integer", "minimum": 0 },
+            "selector": { "type": "string", "minLength": 1, "maxLength": 1024 },
+            "page": { "type": "integer", "minimum": 1 }
+          },
+          "oneOf": [
+            { "required": ["start", "end"] },
+            { "required": ["selector"] },
+            { "required": ["page"] }
+          ]
+        },
+        "retrieved_at": { "$ref": "#/$defs/timestamp" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
         "source": {
           "type": "object",
-          "required": ["url"],
           "additionalProperties": false,
           "properties": {
+            "kind": { "type": "string", "enum": ["web", "document", "vector_store", "tool_result", "user_attachment"] },
             "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
-            "title": { "type": "string", "maxLength": 1000 },
+            "title": { "type": "string", "maxLength": 1024 },
+            "publisher": { "type": "string", "maxLength": 256 },
+            "id": { "type": "string", "maxLength": 256 },
             "snippet": { "type": "string", "maxLength": 4000 },
             "retrieved_at": { "$ref": "#/$defs/timestamp" }
-          }
+          },
+          "anyOf": [
+            { "required": ["url"] },
+            { "required": ["kind"] }
+          ]
         }
-      }
+      },
+      "anyOf": [
+        { "required": ["span", "source"] },
+        { "required": ["anchor", "source"] }
+      ]
     },
     "artifact": {
       "type": "object",
@@ -280,6 +307,9 @@
         "language": { "type": "string", "maxLength": 64 },
         "content": { "type": "string", "maxLength": 1048576 },
         "version": { "type": "integer", "minimum": 1 },
+        "artifact_lineage_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "previous_version_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "immutable": { "type": "boolean" },
         "created_at": { "$ref": "#/$defs/timestamp" },
         "updated_at": { "$ref": "#/$defs/timestamp" }
       }

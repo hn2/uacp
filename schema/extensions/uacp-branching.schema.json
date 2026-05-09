@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-branching",
+  "title": "UACP Branching Extension",
+  "description": "Optional fields on message objects for representing non-linear conversation trees (regenerations, edits, alternative responses). v0.3.1.",
+  "type": "object",
+  "properties": {
+    "branch_parent_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "ID of the message this branch diverges from. MUST reference an existing message in the same conversation. MUST NOT equal the message's own id. Cycles are forbidden."
+    },
+    "branch_label": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "Human-readable label for the branch (e.g. 'regeneration 1', 'edited-question')."
+    }
+  }
+}

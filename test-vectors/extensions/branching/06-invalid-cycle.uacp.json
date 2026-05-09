@@ -1,0 +1,15 @@
+{
+  "uacp": "0.6.0",
+  "id": "conv-branch-ext-invalid-cycle",
+  "tool": "chatgpt",
+  "extensions": ["uacp-branching"],
+  "messages": [
+    { "id": "m1", "role": "user", "content": "first", "branch_parent_id": "m2" },
+    { "id": "m2", "role": "assistant", "content": "second", "branch_parent_id": "m1" }
+  ],
+  "metadata": {
+    "uacp.test.expect": "invalid",
+    "uacp.test.scope": "reference-impl",
+    "uacp.test.reason": "branch_parent_id pointers form a cycle (m1 -> m2 -> m1)"
+  }
+}

@@ -248,7 +248,7 @@ export function validate(doc: unknown): ValidationResult {
   }
 
   if (!doc.uacp || typeof doc.uacp !== 'string' || !SEMVER_RE.test(doc.uacp as string)) {
-    errors.push('uacp: must be a semver string (e.g. "0.6.0")')
+    errors.push('uacp: must be a semver string (e.g. "0.7.0")')
   }
 
   if (!doc.id || typeof doc.id !== 'string' || !(doc.id as string).trim()) {

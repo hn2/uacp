@@ -31,6 +31,8 @@ export interface ThinkingBlock {
   type: 'thinking'
   text: string
   signature?: string
+  model_visibility?: 'visible' | 'hidden' | 'redacted'
+  tokens?: number
 }
 
 export interface ArtifactRefBlock {
@@ -80,12 +82,27 @@ export interface ToolCall {
   input: Record<string, unknown>
 }
 
+export type CitationSourceKind = 'web' | 'document' | 'vector_store' | 'tool_result' | 'user_attachment'
+
+export interface CitationAnchorOffsets { start: number; end: number }
+export interface CitationAnchorSelector { selector: string }
+export interface CitationAnchorPage { page: number }
+export type CitationAnchor = CitationAnchorOffsets | CitationAnchorSelector | CitationAnchorPage
+
 export interface Citation {
-  span: [number, number]
+  span?: [number, number]
   source: {
-    url: string
+    kind?: CitationSourceKind
+    url?: string
     title?: string
+    publisher?: string
+    id?: string
+    snippet?: string
+    retrieved_at?: string
   }
+  anchor?: CitationAnchor
+  retrieved_at?: string
+  confidence?: number
 }
 
 export interface Artifact {
@@ -94,6 +111,12 @@ export interface Artifact {
   title: string
   content: string
   language?: string
+  version?: number
+  artifact_lineage_id?: string
+  previous_version_id?: string
+  immutable?: boolean
+  created_at?: string
+  updated_at?: string
 }
 
 export interface Message {
@@ -101,6 +124,8 @@ export interface Message {
   content: string | ContentBlock[]
   id?: string
   parent_id?: string
+  branch_parent_id?: string
+  branch_label?: string
   timestamp?: string
   model?: string
   tokens?: TokenUsage

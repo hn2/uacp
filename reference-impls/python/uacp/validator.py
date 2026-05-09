@@ -231,7 +231,7 @@ def validate(doc: object) -> dict:
 
     uacp = doc.get('uacp')
     if not isinstance(uacp, str) or not SEMVER_RE.match(uacp):
-        errors.append('uacp: must be a semver string (e.g. "0.6.0")')
+        errors.append('uacp: must be a semver string (e.g. "0.7.0")')
 
     doc_id = doc.get('id')
     if not isinstance(doc_id, str) or not doc_id:
