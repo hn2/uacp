@@ -9,6 +9,13 @@ import (
 var (
 	semverRE  = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
 	iso8601RE = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$`)
+	sha256RE  = regexp.MustCompile(`^[a-f0-9]{64}$`)
+)
+
+const (
+	maxIDLen      = 256
+	maxToolLen    = 128
+	maxContentLen = 1048576
 )
 
 var validRoles = map[string]bool{
@@ -38,6 +45,22 @@ var validProvenance = map[string]bool{
 	"extracted": true, "inferred": true, "system": true, "tool_output": true,
 }
 
+var validRootKeys = map[string]bool{
+	"uacp": true, "id": true, "tool": true, "tool_chain": true, "model": true,
+	"title": true, "extensions": true, "created_at": true, "updated_at": true,
+	"tags": true, "project": true, "branches": true, "messages": true,
+	"metadata": true, "privacy": true,
+}
+
+var validMsgKeys = map[string]bool{
+	"id": true, "parent_id": true, "role": true, "content": true,
+	"timestamp": true, "model": true, "tokens": true, "status": true,
+	"tool_calls": true, "call_id": true, "tool_call_id": true, "name": true,
+	"attachments": true, "citations": true, "artifacts": true,
+	"redactions": true, "metadata": true, "provenance": true,
+	"confidence": true, "provenance_source": true,
+}
+
 // Result is returned by Validate.
 type Result struct {
 	OK     bool
@@ -53,6 +76,13 @@ func Validate(doc any) Result {
 		return Result{OK: false, Errors: []string{"Root must be a JSON object"}}
 	}
 
+	// Unknown root properties
+	for k := range m {
+		if !validRootKeys[k] {
+			errors = append(errors, fmt.Sprintf("root: unknown property '%s'", k))
+		}
+	}
+
 	uacp, _ := m["uacp"].(string)
 	if uacp == "" || !semverRE.MatchString(uacp) {
 		errors = append(errors, `uacp: must be a semver string (e.g. "0.6.0")`)
@@ -61,6 +91,8 @@ func Validate(doc any) Result {
 	docID, _ := m["id"].(string)
 	if strings.TrimSpace(docID) == "" {
 		errors = append(errors, "id: required, must be a non-empty string")
+	} else if len(docID) > maxIDLen {
+		errors = append(errors, fmt.Sprintf("id: must not exceed %d characters", maxIDLen))
 	}
 
 	tool := m["tool"]
@@ -69,16 +101,29 @@ func Validate(doc any) Result {
 	} else {
 		switch v := tool.(type) {
 		case string:
+			if v == "" {
+				errors = append(errors, "tool: string must not be empty (minLength 1)")
+			} else if len(v) > maxToolLen {
+				errors = append(errors, fmt.Sprintf("tool: string must not exceed %d characters", maxToolLen))
+			}
 		case []any:
-			for _, t := range v {
-				if _, ok := t.(string); !ok {
-					errors = append(errors, "tool: must be a string or array of strings")
-					break
+			if len(v) == 0 {
+				errors = append(errors, "tool: array must contain at least one item (minItems 1)")
+			} else {
+				for _, t := range v {
+					if ts, ok := t.(string); !ok || ts == "" {
+						errors = append(errors, "tool: each array item must be a non-empty string")
+						break
+					}
 				}
 			}
 		default:
 			errors = append(errors, "tool: must be a string or array of strings")
 		}
+	}
+
+	if model, exists := m["model"]; exists && model != nil {
+		validateModel(model, "model", &errors)
 	}
 
 	messages, hasMsgs := m["messages"]
@@ -136,12 +181,35 @@ func Validate(doc any) Result {
 	return Result{OK: true}
 }
 
+func validateModel(model any, prefix string, errors *[]string) {
+	switch v := model.(type) {
+	case string:
+		if v == "" {
+			*errors = append(*errors, fmt.Sprintf("%s: must be a non-empty string", prefix))
+		}
+	case map[string]any:
+		id, _ := v["id"].(string)
+		if id == "" {
+			*errors = append(*errors, fmt.Sprintf("%s.id: required non-empty string", prefix))
+		}
+	default:
+		*errors = append(*errors, fmt.Sprintf("%s: must be a string or object", prefix))
+	}
+}
+
 func validateMessage(msg any, idx int, errors *[]string) {
 	p := fmt.Sprintf("messages[%d]", idx)
 	m, ok := msg.(map[string]any)
 	if !ok {
 		*errors = append(*errors, fmt.Sprintf("%s: must be an object", p))
 		return
+	}
+
+	// Unknown message properties
+	for k := range m {
+		if !validMsgKeys[k] {
+			*errors = append(*errors, fmt.Sprintf("%s: unknown property '%s'", p, k))
+		}
 	}
 
 	role, _ := m["role"].(string)
@@ -155,9 +223,16 @@ func validateMessage(msg any, idx int, errors *[]string) {
 	} else {
 		switch v := content.(type) {
 		case string:
+			if len(v) > maxContentLen {
+				*errors = append(*errors, fmt.Sprintf("%s.content: must not exceed %d characters", p, maxContentLen))
+			}
 		case []any:
-			for j, block := range v {
-				validateContentBlock(block, fmt.Sprintf("%s.content[%d]", p, j), errors)
+			if len(v) == 0 {
+				*errors = append(*errors, fmt.Sprintf("%s.content: array must contain at least one item", p))
+			} else {
+				for j, block := range v {
+					validateContentBlock(block, fmt.Sprintf("%s.content[%d]", p, j), errors)
+				}
 			}
 		default:
 			*errors = append(*errors, fmt.Sprintf("%s.content: must be a string or array of content blocks", p))
@@ -176,6 +251,25 @@ func validateMessage(msg any, idx int, errors *[]string) {
 		}
 	}
 
+	if model, exists := m["model"]; exists && model != nil {
+		validateModel(model, fmt.Sprintf("%s.model", p), errors)
+	}
+
+	if tokensRaw, exists := m["tokens"]; exists && tokensRaw != nil {
+		if tokens, ok := tokensRaw.(map[string]any); ok {
+			if inp, exists := tokens["input"]; exists {
+				if n, ok := inp.(float64); ok && n < 0 {
+					*errors = append(*errors, fmt.Sprintf("%s.tokens.input: must be a non-negative number", p))
+				}
+			}
+			if out, exists := tokens["output"]; exists {
+				if n, ok := out.(float64); ok && n < 0 {
+					*errors = append(*errors, fmt.Sprintf("%s.tokens.output: must be a non-negative number", p))
+				}
+			}
+		}
+	}
+
 	provenance, hasProvenance := m["provenance"].(string)
 	if hasProvenance {
 		if !validProvenance[provenance] {
@@ -183,12 +277,45 @@ func validateMessage(msg any, idx int, errors *[]string) {
 		}
 	}
 
-	_, hasConfidence := m["confidence"]
+	confidenceRaw, hasConfidence := m["confidence"]
 	if hasProvenance && provenance == "inferred" && !hasConfidence {
 		*errors = append(*errors, fmt.Sprintf("%s.confidence: required when provenance=inferred", p))
 	}
 	if hasProvenance && provenance == "extracted" && hasConfidence {
 		*errors = append(*errors, fmt.Sprintf("%s.confidence: must not be present when provenance=extracted", p))
+	}
+	if hasConfidence {
+		if c, ok := confidenceRaw.(float64); ok {
+			if c < 0 || c > 1 {
+				*errors = append(*errors, fmt.Sprintf("%s.confidence: must be between 0 and 1", p))
+			}
+		}
+	}
+
+	if toolCallsRaw, exists := m["tool_calls"]; exists && toolCallsRaw != nil {
+		tcs, ok := toolCallsRaw.([]any)
+		if !ok {
+			*errors = append(*errors, fmt.Sprintf("%s.tool_calls: must be an array", p))
+		} else {
+			for k, tc := range tcs {
+				validateToolCall(tc, fmt.Sprintf("%s.tool_calls[%d]", p, k), errors)
+			}
+		}
+	}
+
+	if attachmentsRaw, exists := m["attachments"]; exists && attachmentsRaw != nil {
+		atts, ok := attachmentsRaw.([]any)
+		if !ok {
+			*errors = append(*errors, fmt.Sprintf("%s.attachments: must be an array", p))
+		} else {
+			for k, att := range atts {
+				validateAttachment(att, fmt.Sprintf("%s.attachments[%d]", p, k), errors)
+			}
+		}
+	}
+
+	if redactionsRaw, exists := m["redactions"]; exists && redactionsRaw != nil {
+		validateRedactions(redactionsRaw, fmt.Sprintf("%s.redactions", p), errors)
 	}
 
 	if citations, exists := m["citations"]; exists && citations != nil {
@@ -246,6 +373,57 @@ func validateContentBlock(block any, prefix string, errors *[]string) {
 		if !hasURL && !hasData {
 			*errors = append(*errors, fmt.Sprintf("%s: %s block requires url or data", prefix, btype))
 		}
+	}
+}
+
+func validateToolCall(tc any, prefix string, errors *[]string) {
+	m, ok := tc.(map[string]any)
+	if !ok {
+		*errors = append(*errors, fmt.Sprintf("%s: must be an object", prefix))
+		return
+	}
+	callID, _ := m["call_id"].(string)
+	if callID == "" {
+		*errors = append(*errors, fmt.Sprintf("%s.call_id: required non-empty string", prefix))
+	}
+	name, _ := m["name"].(string)
+	if name == "" {
+		*errors = append(*errors, fmt.Sprintf("%s.name: required non-empty string", prefix))
+	}
+}
+
+func validateAttachment(a any, prefix string, errors *[]string) {
+	m, ok := a.(map[string]any)
+	if !ok {
+		*errors = append(*errors, fmt.Sprintf("%s: must be an object", prefix))
+		return
+	}
+	id, _ := m["id"].(string)
+	if id == "" {
+		*errors = append(*errors, fmt.Sprintf("%s.id: required non-empty string", prefix))
+	}
+	mimeType, _ := m["mime_type"].(string)
+	if mimeType == "" {
+		*errors = append(*errors, fmt.Sprintf("%s.mime_type: required non-empty string", prefix))
+	}
+	if sha, ok := m["sha256"].(string); ok {
+		if !sha256RE.MatchString(sha) {
+			*errors = append(*errors, fmt.Sprintf("%s.sha256: must be 64 lowercase hex chars", prefix))
+		}
+	}
+}
+
+func validateRedactions(red any, prefix string, errors *[]string) {
+	m, ok := red.(map[string]any)
+	if !ok {
+		*errors = append(*errors, fmt.Sprintf("%s: must be an object", prefix))
+		return
+	}
+	if _, exists := m["count"]; !exists {
+		*errors = append(*errors, fmt.Sprintf("%s.count: required integer", prefix))
+	}
+	if _, ok := m["placeholder_format"].(string); !ok {
+		*errors = append(*errors, fmt.Sprintf("%s.placeholder_format: required string", prefix))
 	}
 }
 
@@ -315,7 +493,6 @@ func joinSorted(m map[string]bool) string {
 	for k := range m {
 		keys = append(keys, k)
 	}
-	// simple sort
 	for i := 0; i < len(keys); i++ {
 		for j := i + 1; j < len(keys); j++ {
 			if keys[i] > keys[j] {
