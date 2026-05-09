@@ -83,6 +83,8 @@
       "properties": {
         "id": { "type": "string", "minLength": 1, "maxLength": 256 },
         "parent_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "branch_parent_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "branch_label": { "type": "string", "maxLength": 128 },
         "role": { "type": "string", "enum": ["user", "assistant", "system", "tool"] },
         "content": {
           "oneOf": [
@@ -178,6 +180,8 @@
         "language": { "type": "string", "maxLength": 64 },
         "filename": { "type": "string", "maxLength": 256 },
         "signature": { "type": "string" },
+        "model_visibility": { "type": "string", "enum": ["visible", "hidden"] },
+        "tokens": { "type": "integer", "minimum": 0 },
         "mime_type": { "type": "string", "maxLength": 128 },
         "duration_s": { "type": "number", "minimum": 0 },
         "title": { "type": "string", "maxLength": 512 },
@@ -259,7 +263,8 @@
           "properties": {
             "url": { "type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 2048 },
             "title": { "type": "string", "maxLength": 1000 },
-            "snippet": { "type": "string", "maxLength": 4000 }
+            "snippet": { "type": "string", "maxLength": 4000 },
+            "retrieved_at": { "$ref": "#/$defs/timestamp" }
           }
         }
       }
@@ -274,6 +279,7 @@
         "title": { "type": "string", "minLength": 1, "maxLength": 512 },
         "language": { "type": "string", "maxLength": 64 },
         "content": { "type": "string", "maxLength": 1048576 },
+        "version": { "type": "integer", "minimum": 1 },
         "created_at": { "$ref": "#/$defs/timestamp" },
         "updated_at": { "$ref": "#/$defs/timestamp" }
       }

@@ -59,6 +59,7 @@ var validMsgKeys = map[string]bool{
 	"attachments": true, "citations": true, "artifacts": true,
 	"redactions": true, "metadata": true, "provenance": true,
 	"confidence": true, "provenance_source": true,
+	"branch_parent_id": true, "branch_label": true, "reasoning": true,
 }
 
 // Result is returned by Validate.

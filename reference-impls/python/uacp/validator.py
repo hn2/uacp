@@ -19,6 +19,7 @@ VALID_MSG_KEYS = {
     'id', 'parent_id', 'role', 'content', 'timestamp', 'model', 'tokens', 'status',
     'tool_calls', 'call_id', 'tool_call_id', 'name', 'attachments', 'citations',
     'artifacts', 'redactions', 'metadata', 'provenance', 'confidence', 'provenance_source',
+    'branch_parent_id', 'branch_label', 'reasoning',
 }
 
 MAX_ID_LEN = 256

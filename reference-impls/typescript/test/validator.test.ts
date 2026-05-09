@@ -158,7 +158,7 @@ describe('validate', () => {
   })
 
   it('accepts exactly 32 extensions', () => {
-    const extensions = Array.from({ length: 32 }, (_, i) => ({ id: `ext-${i}` }))
+    const extensions = Array.from({ length: 32 }, (_, i) => `uacp-ext-${i}`)
     const r = validate({ ...minimal, extensions })
     assert.equal(r.ok, true)
   })

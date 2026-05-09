@@ -23,6 +23,7 @@ const VALID_MSG_KEYS = new Set([
   'status', 'tool_calls', 'call_id', 'tool_call_id', 'name', 'attachments',
   'citations', 'artifacts', 'redactions', 'metadata', 'provenance',
   'confidence', 'provenance_source',
+  'branch_parent_id', 'branch_label', 'reasoning',
 ])
 
 function isObject(v: unknown): v is Record<string, unknown> {
@@ -308,8 +309,8 @@ export function validate(doc: unknown): ValidationResult {
       errors.push('extensions: must not contain more than 32 items')
     } else {
       ;(doc.extensions as unknown[]).forEach((ext, i) => {
-        if (!isObject(ext) || typeof (ext as Record<string, unknown>).id !== 'string') {
-          errors.push(`extensions[${i}].id: required`)
+        if (typeof ext !== 'string' || !(ext as string)) {
+          errors.push(`extensions[${i}]: must be a non-empty string`)
         }
       })
     }
