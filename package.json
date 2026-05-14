@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "validate": "node validate.js",
-    "test": "node test/version-consistency.js && node --test test/resource-limits.test.js && node validate.js && node conformance/harness/run.js"
+    "test": "node test/version-consistency.js && node --test test/resource-limits.test.js && node --test test/vector-clock.test.js && node validate.js && node conformance/harness/run.js"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
