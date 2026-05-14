@@ -41,6 +41,33 @@ function detectSchemaId(doc) {
   return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
+function resolveValidationTarget(doc) {
+  if (doc && typeof doc.fixture_id === 'string') {
+    if (doc.event && typeof doc.event === 'object') {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
+    }
+    if (Array.isArray(doc.registrations) && doc.registrations.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration', target: doc.registrations[0] }
+    }
+    if (doc.payload && typeof doc.payload === 'object' && doc.payload.algorithm) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload }
+    }
+    if (doc.clocks && Array.isArray(doc.clocks)) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
+    }
+    if (doc.scopes && Array.isArray(doc.scopes)) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0] }
+    }
+    if (doc.member_set && typeof doc.member_set === 'object') {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_set }
+    }
+    if (Array.isArray(doc.member_sets) && doc.member_sets.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_sets[0] }
+    }
+  }
+  return { schemaId: detectSchemaId(doc), target: doc }
+}
+
 function collectVectors(args) {
   if (args.length > 0) {
     return args.map(a => path.resolve(process.cwd(), a)).sort()
@@ -76,9 +103,11 @@ function main() {
     const name = path.relative(path.resolve(__dirname, 'test-vectors'), file)
     try {
       const doc = readJson(file)
-      const expectInvalid = doc && doc.metadata && doc.metadata['uacp.test.expect'] === 'invalid'
-      const schemaId = detectSchemaId(doc)
-      const valid = ajv.validate(schemaId, doc)
+      const schemaErrorCodes = new Set(['invalid', 'UNKNOWN_ROLE'])
+      const expectInvalid = (doc?.metadata?.['uacp.test.expect'] === 'invalid') ||
+        (doc?.fixture_id && schemaErrorCodes.has(doc?.expected))
+      const { schemaId, target } = resolveValidationTarget(doc)
+      const valid = ajv.validate(schemaId, target)
       const errors = ajv.errors || []
 
       if (expectInvalid) {
