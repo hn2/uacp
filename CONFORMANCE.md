@@ -114,23 +114,37 @@ Provenance defaults are defined in the spec; they are **not enforced** by the sc
 
 ## 5. Extensions registry
 
-| Extension ID | Schema | Spec | Description |
-|---|---|---|---|
-| `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | `spec/extensions/uacp-encryption.md` | AES-256-GCM envelope |
+All extensions are optional. An implementation declares what it supports; the harness validates that declared extensions pass their conformance fixtures.
+
+| Extension ID | Schema | Spec | Test vectors | Issue | Description |
+|---|---|---|---|---|---|
+| `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | `spec/extensions/uacp-encryption.md` | — | — | Legacy AES-256-GCM + Argon2id envelope (v0.5.0) |
+| `uacp-sync-event` | `schema/extensions/uacp-sync-event.schema.json` | `spec/extensions/uacp-sync-event.md` | `test-vectors/extensions/sync-event/` | #36 | Ed25519-signed event envelope with vector clock |
+| `uacp-identity-key` | `schema/extensions/uacp-identity-key.schema.json` | `spec/extensions/uacp-identity-key.md` | `test-vectors/extensions/identity-chain/` | #42 | Ed25519 identity key |
+| `uacp-device-registration` | `schema/extensions/uacp-device-registration.schema.json` | — | `test-vectors/extensions/identity-chain/` | #42 | Device registration + retirement |
+| `uacp-event-payload` | `schema/extensions/uacp-event-payload.schema.json` | `spec/extensions/uacp-event-payload.md` | `test-vectors/extensions/event-payload/` | #43 | AES-256-GCM encrypted event payload |
+| `uacp-vector-clock` | `schema/extensions/uacp-vector-clock.schema.json` | `spec/extensions/uacp-vector-clock.md` | (unit tests only) | #37 | Vector clock format + merge semantics |
+| `uacp-scope-identifier` | `schema/extensions/uacp-scope-identifier.schema.json` | `spec/extensions/uacp-scope-identifier.md` | `test-vectors/extensions/scope-identifier/` | #38 | Scope identifier with GovernanceAxes |
+| `uacp-member-set` | `schema/extensions/uacp-member-set.schema.json` | `spec/extensions/uacp-member-set.md` | `test-vectors/extensions/member-set/` | #39 | Scope membership + per-member scope-key encryption |
+| `uacp-promotion-event` | `schema/extensions/uacp-promotion-event.schema.json` | `spec/extensions/uacp-promotion-event.md` | `test-vectors/extensions/promotion-event/` | #40 | Content promotion into a scope |
+| `uacp-withdraw-event` | `schema/extensions/uacp-withdraw-event.schema.json` | `spec/extensions/uacp-withdraw-event.md` | `test-vectors/extensions/withdraw-event/` | #41 | Content withdrawal from a scope |
+| `uacp-audit-event` | `schema/extensions/uacp-audit-event.schema.json` | `spec/extensions/uacp-audit-event.md` | `test-vectors/extensions/audit-event/` | #44 | Audit event with SHA-256 hash-chain |
 
 Implementations declare extensions via the top-level `extensions` array:
 
 ```json
-{ "extensions": ["uacp-encryption"] }
+{ "extensions": ["uacp-sync-event", "uacp-audit-event"] }
 ```
 
 ## 6. Verified implementations
 
+See `INTEROP.md` for the full interoperability matrix and instructions for registering a new implementation.
+
 | Implementation | Language | Level | Extensions | Verified | Notes |
 |---|---|---|---|---|---|
-| UACP reference harness | JavaScript (Node.js) | L3 | uacp-encryption | 2026-05-07 | Ships with this repo at `conformance/harness/`. |
+| UACP reference harness | JavaScript (Node.js) | L3 | all (see INTEROP.md) | 2026-05-14 | Ships with this repo at `conformance/harness/`. |
 
-Implementations submit entries via PR against this file. The PR MUST include
+Implementations submit entries via PR against `INTEROP.md`. The PR MUST include
 a harness log showing all tests passing, the harness commit SHA, and the
 impl SHA tested.
 
