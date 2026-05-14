@@ -48,9 +48,31 @@ function detectSchemaId(doc) {
   return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
+function resolveValidationTarget(doc) {
+  if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration',
+      target: doc.registrations[0],
+    }
+  }
+  if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.identity_keys) && doc.identity_keys.length > 0) {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-identity-key',
+      target: doc.identity_keys[0],
+    }
+  }
+  if (doc && typeof doc.fixture_id === 'string' && doc.event && typeof doc.event === 'object') {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
+      target: doc.event,
+    }
+  }
+  return { schemaId: detectSchemaId(doc), target: doc }
+}
+
 function validateDoc(ajv, doc) {
-  const schemaId = detectSchemaId(doc)
-  const valid = ajv.validate(schemaId, doc)
+  const { schemaId, target } = resolveValidationTarget(doc)
+  const valid = ajv.validate(schemaId, target)
   const errors = (ajv.errors || []).map(e => `${e.instancePath || '(root)'} ${e.message}`)
   return { valid, errors }
 }
