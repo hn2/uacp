@@ -41,6 +41,17 @@ function detectSchemaId(doc) {
   return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
+// Returns { schemaId, target } where target is the sub-document to validate.
+function resolveValidationTarget(doc) {
+  if (doc && typeof doc.fixture_id === 'string' && doc.event && typeof doc.event === 'object') {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
+      target: doc.event,
+    }
+  }
+  return { schemaId: detectSchemaId(doc), target: doc }
+}
+
 function collectVectors(args) {
   if (args.length > 0) {
     return args.map(a => path.resolve(process.cwd(), a)).sort()
@@ -77,8 +88,8 @@ function main() {
     try {
       const doc = readJson(file)
       const expectInvalid = doc && doc.metadata && doc.metadata['uacp.test.expect'] === 'invalid'
-      const schemaId = detectSchemaId(doc)
-      const valid = ajv.validate(schemaId, doc)
+      const { schemaId, target } = resolveValidationTarget(doc)
+      const valid = ajv.validate(schemaId, target)
       const errors = ajv.errors || []
 
       if (expectInvalid) {
