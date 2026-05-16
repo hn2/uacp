@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "validate": "node validate.js",
-    "test": "node test/version-consistency.js && node --test test/resource-limits.test.js && node --test tools/uacp-validate/__tests__/*.test.js && node validate.js && node conformance/harness/run.js"
+    "test": "node test/version-consistency.js && node --test test/resource-limits.test.js && node --test tools/uacp-validate/__tests__/*.test.js && node validate.js && node conformance/harness/run.js",
+    "test:context-sharing": "node conformance/harness/run.js context-sharing --vectors conformance/vectors/context-sharing/event-chains/"
   },
   "devDependencies": {
     "@noble/ed25519": "^3.1.0",
