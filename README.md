@@ -827,6 +827,20 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 *Community specification — see GOVERNANCE.md*
 *Created: 2026-04-17 | Updated: 2026-05-07 (v0.5.0)*
 
+## Context-sharing primitives
+
+Context-sharing envelopes carry signed, scoped events between devices and vendors. Each event is wrapped in a `signed-event-envelope` — an ed25519-signed container that includes a vector clock for ordering, a scope identifier for access control, and a canonical-JSON signature for integrity. The schemas under `schema/v1/context-sharing/` define the structural contract; `signing.js` provides the crypto primitives.
+
+```javascript
+const { verifySignedEvent, canonicalJSON } = require('./signing')
+
+// Verify a signed event received from another device or vendor
+const result = verifySignedEvent(envelope, { publicKey: senderPublicKeyBase64 })
+if (!result.valid) throw new Error(result.error)
+```
+
+Run `node validate.js` to validate context-sharing conformance vectors (structural + ed25519 signature verification). Pass `--skip-crypto` to run structural-only checks in environments without native bindings.
+
 ## 18. Validation And Boundary
 
 - Run `node validate.js` for a fast conformance pre-check over `test-vectors/`.

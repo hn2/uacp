@@ -1,0 +1,8 @@
+{
+  "_schema": "vector-clock",
+  "_expect": "invalid",
+  "body": {
+    "device-A": -1,
+    "device-B": 1
+  }
+}
