@@ -12,6 +12,7 @@
     "version",
     "author",
     "created_at",
+    "signature",
     "body"
   ],
   "additionalProperties": false,

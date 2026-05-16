@@ -1,9 +1,8 @@
 # uacp-validate
 
-A zero-dependency Node.js validator for UACP v1 artifact envelopes. It reads a YAML
-file, checks that all required envelope fields are present and correctly typed
-(per `spec/v1/envelope.schema.json`), and verifies the SHA-256 integrity signature when
-one is present. Run it with:
+A minimal Node.js validator for UACP v1 artifact envelopes. It reads a YAML file,
+checks that all required envelope fields are present and correctly typed (per
+`spec/v1/envelope.schema.json`), and verifies the SHA-256 integrity signature. Run it with:
 
 ```
 node tools/uacp-validate/index.js <path-to-envelope.yml>

@@ -32,15 +32,6 @@ the wire*.
   (routing decisions, prompt templates, model selection, operator pipelines) is
   explicitly out of scope.
 
-### Relationship to FLP
-
-FLP (FusionLayer Protocol) is an engine-side protocol that implements and transports
-UACP artifacts. UACP defines what artifacts look like and what they mean. FLP defines
-how those artifacts are stored, cached, routed, and injected. The two are complementary
-and independent: any compliant engine MAY implement FLP without implementing UACP, and
-any UACP-compliant consumer MAY accept UACP artifacts regardless of whether they were
-produced by an FLP engine.
-
 ---
 
 ## §2 — Layer Model
@@ -71,18 +62,18 @@ issue that normatively defines its `body` field.
 
 ### Core kinds
 
-| Kind                | Sub-spec issue | Description                                         |
-|---------------------|----------------|-----------------------------------------------------|
-| `memory`            | #56            | Persistent facts, preferences, and recalled context |
-| `policy`            | #57            | Rules and constraints the engine must enforce       |
-| `guideline`         | #58            | Soft instructions and style preferences             |
-| `persona`           | #59            | Identity, voice, and behavioral configuration       |
-| `redaction-pattern` | #60            | Patterns used to redact sensitive content           |
-| `source`            | #61            | Citation and reference material                     |
-| `theme`             | #62            | Visual or tonal configuration                       |
-| `trace`             | #63            | Audit record of engine actions                      |
-| `pack`              | #64            | A named collection of related artifacts             |
-| `playbook`          | #65            | A sequenced workflow of actions or instructions     |
+| Kind                | Sub-spec link                       | Status  | Description                                         |
+|---------------------|-------------------------------------|---------|-----------------------------------------------------|
+| `memory`            | `spec/v1/kinds/MEMORY.md`           | Draft   | Persistent facts, preferences, and recalled context |
+| `policy`            | `spec/v1/kinds/POLICY.md`           | Draft   | Rules and constraints the engine must enforce       |
+| `guideline`         | `spec/v1/kinds/GUIDELINE.md`        | Draft   | Soft instructions and style preferences             |
+| `persona`           | `spec/v1/kinds/PERSONA.md`          | Draft   | Identity, voice, and behavioral configuration       |
+| `redaction-pattern` | `spec/v1/kinds/REDACTION-PATTERN.md`| Draft   | Patterns used to redact sensitive content           |
+| `source`            | `spec/v1/kinds/SOURCE.md`           | Draft   | Citation and reference material                     |
+| `theme`             | `spec/v1/kinds/THEME.md`            | Draft   | Visual or tonal configuration                       |
+| `trace`             | `spec/v1/kinds/TRACE.md`            | Draft   | Audit record of engine actions                      |
+| `pack`              | `spec/v1/kinds/PACK.md`             | Draft   | A named collection of related artifacts             |
+| `playbook`          | `spec/v1/kinds/PLAYBOOK.md`         | Draft   | A sequenced workflow of actions or instructions     |
 
 ### Extension kinds
 

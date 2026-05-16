@@ -5,10 +5,11 @@
   "type": "commonjs",
   "scripts": {
     "validate": "node validate.js",
-    "test": "node test/version-consistency.js && node --test test/resource-limits.test.js && node validate.js && node conformance/harness/run.js"
+    "test": "node test/version-consistency.js && node --test test/resource-limits.test.js && node --test tools/uacp-validate/__tests__/*.test.js && node validate.js && node conformance/harness/run.js"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "js-yaml": "^4.1.0"
   }
 }
