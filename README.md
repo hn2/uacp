@@ -833,5 +833,9 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 - Run `node conformance/harness/run.js` for the full conformance suite (core + extensions).
 - See [docs/UACP-BOUNDARY.md](docs/UACP-BOUNDARY.md) for the canonical boundary between UACP core, extensions, and implementation-specific concerns.
 
+### Validating UACP documents
+
+When an artifact envelope includes a `kind` and `body`, `validate.js` automatically validates the `body` against the matching kind schema from `schema/v1/kinds/` (e.g. `memory`, `persona`, `playbook`) and surfaces any errors with the path prefix `body/`.
+
 
 
