@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "schemas": [
+    {
+      "id": "uacp-conversation-v1",
+      "url": "https://uacp.dev/schema/v1/core",
+      "description": "UACP Conversation core schema",
+      "status": "stable"
+    },
+    {
+      "id": "uacp-signing-v2",
+      "url": "https://uacp.dev/schema/v1/signing",
+      "description": "UACP Ed25519 signing sub-spec schema",
+      "status": "draft"
+    }
+  ]
+}
