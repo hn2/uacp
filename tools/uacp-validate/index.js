@@ -29,7 +29,7 @@ const ISO_Z_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/
 function validateEnvelope(env) {
   if (!env || typeof env !== 'object' || Array.isArray(env)) throw new Error('envelope_not_object')
 
-  const required = ['uacp_version', 'kind', 'id', 'schema_version', 'version', 'author', 'created_at', 'signature', 'body']
+  const required = ['uacp_version', 'kind', 'id', 'schema_version', 'version', 'subject', 'author', 'created_at', 'signature', 'body']
   for (const k of required) if (!(k in env)) throw new Error(`missing_required:${k}`)
 
   if (env.uacp_version !== 1) throw new Error('uacp_version_must_be_1')
@@ -37,10 +37,19 @@ function validateEnvelope(env) {
   if (typeof env.id !== 'string' || env.id.length < 1) throw new Error('id_invalid')
   if (!Number.isInteger(env.schema_version) || env.schema_version < 1) throw new Error('schema_version_invalid')
   if (typeof env.version !== 'string' || !SEMVER_RE.test(env.version)) throw new Error('version_invalid')
+  if (typeof env.subject !== 'string' || env.subject.length < 1) throw new Error('subject_invalid')
   if (typeof env.author !== 'string' || env.author.length < 1) throw new Error('author_invalid')
   if (typeof env.created_at !== 'string' || !ISO_Z_RE.test(env.created_at)) throw new Error('created_at_invalid')
   if (typeof env.signature !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(env.signature)) throw new Error('signature_invalid')
   if (typeof env.body !== 'object' || env.body === null) throw new Error('body_invalid')
+
+  if ('audience' in env) {
+    if (!Array.isArray(env.audience)) throw new Error('audience_must_be_array')
+    for (const p of env.audience) {
+      if (typeof p !== 'string' || p.length < 1) throw new Error('audience_entry_invalid')
+    }
+  }
+  if ('scope' in env && typeof env.scope !== 'string') throw new Error('scope_must_be_string')
 
   const declared = env.signature.slice('sha256:'.length)
   const clone = JSON.parse(JSON.stringify(env))

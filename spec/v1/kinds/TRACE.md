@@ -2,7 +2,9 @@
 
 **Kind:** `trace`
 **Schema version:** 1
-**Status:** Draft
+**Status:** Moved — `trace` was removed from UACP-Core kinds in v0.2 (per ADR 0038). This file is
+preserved as a starting point for the standalone UACP-Trace spec. See [uacp#79](https://github.com/hn2/uacp/issues/79)
+for the investigation into whether UACP-Trace should profile OpenTelemetry or be authored from scratch.
 
 ---
 

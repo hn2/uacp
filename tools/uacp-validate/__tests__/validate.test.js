@@ -33,6 +33,33 @@ test('missing required field rejected', () => {
   assert.throws(() => validateEnvelope(env), /missing_required:author/)
 })
 
+test('missing subject rejected', () => {
+  const yaml = require('js-yaml')
+  const env = yaml.load(loadExample())
+  delete env.subject
+  assert.throws(() => validateEnvelope(env), /missing_required:subject/)
+})
+
+test('audience must be array', () => {
+  const yaml = require('js-yaml')
+  const env = yaml.load(loadExample())
+  env.audience = 'not-an-array'
+  const clone = JSON.parse(JSON.stringify(env))
+  delete clone.signature
+  env.signature = `sha256:${sha256Hex(canonicalJson(clone))}`
+  assert.throws(() => validateEnvelope(env), /audience_must_be_array/)
+})
+
+test('audience array of principals validates', () => {
+  const yaml = require('js-yaml')
+  const env = yaml.load(loadExample())
+  env.audience = ['did:key:z6MkAbc123', 'did:web:example.com:users:bob']
+  const clone = JSON.parse(JSON.stringify(env))
+  delete clone.signature
+  env.signature = `sha256:${sha256Hex(canonicalJson(clone))}`
+  assert.doesNotThrow(() => validateEnvelope(env))
+})
+
 test('unknown namespaced kind passes through without modification', () => {
   const yaml = require('js-yaml')
   const env = yaml.load(loadExample())
