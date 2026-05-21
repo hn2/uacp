@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UACP — Unified AI Context Protocol</title>
+  <title>UACP — Universal AI Context Protocol</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1a1a1a; background: #fff; line-height: 1.6; }
@@ -25,50 +25,67 @@
     .card p { font-size: 0.9rem; color: #555; }
     .card a { color: #1a1a1a; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-block; margin-top: 0.75rem; }
     .card a:hover { text-decoration: underline; }
+    .badge { font-size: 0.7rem; background: #e8f4fd; color: #0070c9; padding: 0.15rem 0.45rem; border-radius: 3px; vertical-align: middle; margin-left: 0.3rem; }
+    .section-title { font-size: 1.125rem; font-weight: 700; margin-top: 4rem; margin-bottom: 1rem; color: #333; border-bottom: 1px solid #e5e5e5; padding-bottom: 0.5rem; }
     footer { border-top: 1px solid #e5e5e5; padding: 1.5rem 2rem; text-align: center; font-size: 0.8rem; color: #888; margin-top: 4rem; }
   </style>
 </head>
 <body>
   <header>
     <h1>uacp</h1>
-    <span class="version">v1.0.0</span>
+    <span class="version">v1 (draft)</span>
   </header>
 
   <main>
     <section class="hero">
-      <h2>Unified AI Context Protocol</h2>
+      <h2>Universal AI Context Protocol</h2>
       <p>
         UACP is an open, vendor-neutral format for AI conversation context —
         designed to move cleanly across models, tools, and systems without
         lock-in or data loss.
       </p>
       <div class="cta">
-        <a class="btn btn-primary" href="https://github.com/hn2/uacp/tree/master/spec">Read the spec</a>
+        <a class="btn btn-primary" href="https://github.com/hn2/uacp/blob/master/spec/v1/UACP-CORE.md">Read the spec</a>
         <a class="btn btn-secondary" href="schema-registry.json">Schema registry</a>
         <a class="btn btn-secondary" href="https://github.com/hn2/uacp">GitHub</a>
       </div>
     </section>
 
+    <p class="section-title">UACP</p>
     <div class="grid">
       <div class="card">
-        <h3>Specification</h3>
-        <p>Full normative spec covering conversation structure, message types, tool calls, branches, and signing.</p>
-        <a href="https://github.com/hn2/uacp/tree/master/spec">Browse spec &rarr;</a>
+        <h3>Core spec</h3>
+        <p>Normative specification for UACP envelopes: context-only narrowing, subject/audience/scope permissions model, signing.</p>
+        <a href="https://github.com/hn2/uacp/blob/master/spec/v1/UACP-CORE.md">UACP-CORE.md &rarr;</a>
       </div>
       <div class="card">
-        <h3>Reference implementations</h3>
-        <p>TypeScript, Go, and Python implementations with validators, parsers, and serializers.</p>
-        <a href="https://github.com/hn2/uacp/tree/master/reference-impls">View implementations &rarr;</a>
+        <h3>UACP-Trace v2</h3>
+        <p>OTel gen_ai semantic conventions profile + uacp.* extension layer. Privacy enforcement for smart/private/incognito modes.</p>
+        <a href="https://github.com/hn2/uacp/blob/master/spec/uacp-trace/UACP-TRACE.md">UACP-TRACE.md &rarr;</a>
       </div>
       <div class="card">
-        <h3>Conformance</h3>
-        <p>L1/L2/L3 conformance levels, verified implementations, and a harness you can run against your own code.</p>
-        <a href="https://github.com/hn2/uacp/blob/master/CONFORMANCE.md">Conformance guide &rarr;</a>
+        <h3>Validator</h3>
+        <p>CLI + programmatic validator for UACP envelopes. Checks required fields, signature, audience array, scope.</p>
+        <a href="https://github.com/hn2/uacp/tree/master/tools/uacp-validate">tools/uacp-validate &rarr;</a>
       </div>
       <div class="card">
         <h3>Schema registry</h3>
-        <p>Machine-readable index of all published UACP schemas. Use it to resolve schema IDs at runtime.</p>
+        <p>Machine-readable index of all published UACP and sibling protocol schemas. Includes AAP and Capture-Manifest.</p>
         <a href="schema-registry.json">schema-registry.json &rarr;</a>
+      </div>
+    </div>
+
+    <p class="section-title">Sibling protocols</p>
+    <div class="grid">
+      <div class="card">
+        <h3>AAP <span class="badge">draft</span></h3>
+        <p>Agent Action Protocol — operator/tool/action descriptions that cross AI vendor boundaries. Converges with MCP, OpenAI tools, and Anthropic tool-use.</p>
+        <a href="https://github.com/hn2/aap/blob/main/spec/v0.1/AAP.md">AAP.md &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Capture-Manifest <span class="badge">draft</span></h3>
+        <p>Provenance, consent basis, and applied redactions for captured material. GDPR Article 13/14 + CCPA compliance mapping.</p>
+        <a href="https://github.com/hn2/capture-manifest/blob/main/spec/v0.1/CAPTURE-MANIFEST.md">CAPTURE-MANIFEST.md &rarr;</a>
       </div>
     </div>
   </main>
