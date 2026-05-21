@@ -196,6 +196,65 @@ All v1 fields map cleanly to v2. No information is lost in migration.
 
 ---
 
+## §8b — Reference Implementation Sketch (informative)
+
+The following Python sketch shows how to instrument a UACP-aware LLM call using the
+OTel Python SDK. It is informative only — implementations MAY differ in language or SDK.
+
+```python
+from opentelemetry import trace
+from opentelemetry.semconv._incubating.attributes import gen_ai_attributes as GenAI
+
+tracer = trace.get_tracer("fusionlayer.uacp-trace", "2.0.0")
+
+def call_llm(prompt: str, model: str, uacp_ctx: dict) -> str:
+    privacy_mode = uacp_ctx.get("privacy_mode", "smart")
+
+    with tracer.start_as_current_span("gen_ai.execute") as span:
+        # OTel gen_ai base attributes
+        span.set_attribute(GenAI.GEN_AI_SYSTEM, "openai")
+        span.set_attribute(GenAI.GEN_AI_OPERATION_NAME, "chat")
+        span.set_attribute(GenAI.GEN_AI_REQUEST_MODEL, model)
+
+        # uacp.* extension attributes
+        span.set_attribute("uacp.privacy_mode", privacy_mode)
+        span.set_attribute("uacp.subject", uacp_ctx["subject"])
+        span.set_attribute("uacp.audience", uacp_ctx.get("audience", []))
+        span.set_attribute("uacp.scope", uacp_ctx.get("scope", "individual"))
+
+        if uacp_ctx.get("artifact_id"):
+            span.set_attribute("uacp.artifact_id", uacp_ctx["artifact_id"])
+        if uacp_ctx.get("session_id"):
+            span.set_attribute("uacp.session_id", uacp_ctx["session_id"])
+
+        # Privacy enforcement
+        if privacy_mode == "incognito":
+            span.set_attribute("uacp.sensitive", True)
+            # Collector config drops gen_ai.prompt / gen_ai.completion for sensitive spans
+        # (private mode: collector config hides inputs only; no span-level flag needed)
+
+        response = _do_llm_call(prompt, model)
+
+        span.set_attribute(GenAI.GEN_AI_USAGE_INPUT_TOKENS, response.usage.input_tokens)
+        span.set_attribute(GenAI.GEN_AI_USAGE_OUTPUT_TOKENS, response.usage.output_tokens)
+
+        return response.content
+```
+
+Fanout span (parallel eval) example:
+
+```python
+fanout_id = str(uuid.uuid4())
+for perspective in perspectives:
+    with tracer.start_as_current_span("gen_ai.execute") as span:
+        span.set_attribute(GenAI.GEN_AI_OPERATION_NAME, "parallel_eval")
+        span.set_attribute("uacp.fanout_id", fanout_id)
+        span.set_attribute("uacp.privacy_mode", privacy_mode)
+        # ... rest of attributes
+```
+
+---
+
 ## §9 — Upstream RFC Candidates
 
 The following additions are proposed for upstream OpenTelemetry governance:
