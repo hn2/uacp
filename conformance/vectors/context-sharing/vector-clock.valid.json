@@ -1,0 +1,9 @@
+{
+  "_schema": "vector-clock",
+  "_expect": "valid",
+  "body": {
+    "device-A": 3,
+    "device-B": 1,
+    "device-C": 0
+  }
+}

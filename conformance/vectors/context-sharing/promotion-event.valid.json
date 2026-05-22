@@ -1,0 +1,12 @@
+{
+  "_schema": "promotion-event",
+  "_expect": "valid",
+  "body": {
+    "event_type": "promotion",
+    "artifact_id": "1f83d9ab-6b2e-4b9a-a3e7-1ee3cf3c6a23",
+    "from_scope_id": "11111111-1111-1111-1111-111111111111",
+    "to_scope_id": "4a0a0f7f-0c5f-4ab8-9b0c-88d0b4f00b3a",
+    "re_encrypted_body": "YmFzZTY0LWJsb2I=",
+    "scope_key_id_used": "d8b3f9a1-0b0a-4a2e-a5b1-4aa7c0e5d3b6"
+  }
+}

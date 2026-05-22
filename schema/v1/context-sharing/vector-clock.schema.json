@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/v1/context-sharing/vector-clock",
+  "title": "UACP Vector Clock",
+  "description": "Vector clock format used by context-sharing events. Maps device_id strings to integer counters.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "integer",
+    "minimum": 0
+  }
+}

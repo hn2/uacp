@@ -170,9 +170,129 @@ function computeAchievedLevel(results) {
   return 'none'
 }
 
+// --- Context-sharing event-chain harness ---
+
+function classifySignature(sig) {
+  if (sig === undefined || sig === null) return 'missing'
+  if (typeof sig === 'string' && /^[0-9a-f]{64,}$/i.test(sig)) return 'valid'
+  return 'invalid'
+}
+
+async function runContextSharingVectors(vectorsDir, options = {}) {
+  const results = []
+  let files
+
+  try {
+    files = fs.readdirSync(vectorsDir).filter(n => n.endsWith('.json')).sort()
+  } catch (e) {
+    return [{ vector_id: vectorsDir, passed: false, failures: [`VECTOR_FILE_INVALID: Cannot read vectors directory: ${e.message}`], duration_ms: 0 }]
+  }
+
+  for (const file of files) {
+    const filePath = path.join(vectorsDir, file)
+    const startMs = Date.now()
+    let vector
+
+    try {
+      vector = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+    } catch (e) {
+      results.push({ vector_id: file, passed: false, failures: [`VECTOR_FILE_INVALID: Vector file is not valid JSON`], duration_ms: Date.now() - startMs })
+      continue
+    }
+
+    if (!Array.isArray(vector.events)) continue
+
+    const failures = []
+    const events = vector.events
+    const eventById = new Map(events.map(e => [e.event_id, e]))
+    const causality = vector.expected_causality ?? {}
+    const expectedSigs = vector.expected_signatures ?? {}
+
+    // Verify expected_signatures match the actual signature fields in the vector events
+    for (const [eventId, expectedState] of Object.entries(expectedSigs)) {
+      const event = eventById.get(eventId)
+      if (!event) {
+        failures.push(`Vector definition error: expected_signatures references ${eventId} which is not in events array`)
+        continue
+      }
+      const actualState = classifySignature(event.signature)
+      if (actualState !== expectedState) {
+        failures.push(`Vector definition error: expected_signatures[${eventId}]=${expectedState} but actual signature classifies as ${actualState}`)
+      }
+    }
+
+    // Detect causal issues that would cause a UACP implementation to reject the chain
+    const detectedCausalIssues = []
+    for (const [eventId, causedBy] of Object.entries(causality)) {
+      if (!eventById.has(eventId)) {
+        detectedCausalIssues.push(`CAUSAL_ORDER_VIOLATION: ${eventId} not in events array`)
+        continue
+      }
+      const event = eventById.get(eventId)
+      const predecessor = eventById.get(causedBy)
+
+      if (!predecessor) {
+        detectedCausalIssues.push(`ORPHANED_EVENT: Event has no valid predecessor in chain — ${eventId} caused_by ${causedBy} which is missing`)
+        continue
+      }
+
+      const eventIdx = events.findIndex(e => e.event_id === eventId)
+      const predIdx = events.findIndex(e => e.event_id === causedBy)
+      if (eventIdx < predIdx) {
+        detectedCausalIssues.push(`CAUSAL_ORDER_VIOLATION: Event received out of causal order — ${eventId} at index ${eventIdx} precedes its cause ${causedBy} at index ${predIdx}`)
+      }
+
+      const ec = event.vector_clock ?? {}
+      const pc = predecessor.vector_clock ?? {}
+      for (const [device, count] of Object.entries(pc)) {
+        const eventCount = ec[device] ?? 0
+        if (eventCount < count) {
+          detectedCausalIssues.push(`CAUSAL_ORDER_VIOLATION: Event received out of causal order — ${eventId} vector_clock[${device}]=${eventCount} regresses predecessor ${causedBy} clock[${device}]=${count}`)
+        }
+      }
+    }
+
+    // Derive the outcome a UACP implementation would compute
+    const hasSignatureIssues = Object.values(expectedSigs).some(s => s !== 'valid')
+    const computedOutcome = (hasSignatureIssues || detectedCausalIssues.length > 0) ? 'rejected' : 'accepted'
+
+    if (vector.expected_outcome && vector.expected_outcome !== computedOutcome) {
+      failures.push(`Outcome mismatch: vector expects ${vector.expected_outcome} but harness computed ${computedOutcome} (causal issues: [${detectedCausalIssues.join('; ')}])`)
+    }
+
+    results.push({ vector_id: vector.id ?? file, passed: failures.length === 0, failures, duration_ms: Date.now() - startMs })
+  }
+
+  return results
+}
+
 // CLI entry point
 async function main() {
   const args = process.argv.slice(2)
+  const mode = args[0]
+
+  if (mode === 'context-sharing') {
+    let vectorsDir = path.join(REPO_ROOT, 'conformance', 'vectors', 'context-sharing', 'event-chains')
+    for (let i = 1; i < args.length; i++) {
+      if (args[i] === '--vectors' && args[i + 1]) vectorsDir = path.resolve(process.cwd(), args[++i])
+    }
+
+    const results = await runContextSharingVectors(vectorsDir)
+    console.log(`\nUACP Context-Sharing Conformance Harness`)
+    console.log(`=========================================`)
+    const passed = results.filter(r => r.passed).length
+    const failed = results.filter(r => !r.passed).length
+    console.log(`Passed: ${passed}  Failed: ${failed}\n`)
+    for (const r of results) {
+      const icon = r.passed ? '✓' : '✗'
+      console.log(`${icon} ${r.vector_id} (${r.duration_ms}ms)`)
+      for (const f of r.failures) console.log(`    ${f}`)
+    }
+    if (failed > 0) { console.log(`\n✗ Context-sharing conformance check failed`); process.exit(1) }
+    else { console.log(`\n✓ All context-sharing checks passed`) }
+    return
+  }
+
   let level = 'L3'
   let implPath = null
 
@@ -208,3 +328,5 @@ async function main() {
 }
 
 main().catch(e => { console.error(e); process.exit(1) })
+
+module.exports = { runConformance, runContextSharingVectors }

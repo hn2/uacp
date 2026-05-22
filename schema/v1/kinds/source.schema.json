@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/v1/kinds/source",
+  "title": "UACP Source Body",
+  "description": "Body schema for the source artifact kind — a citation or reference material.",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "url": {
+      "type": "string",
+      "maxLength": 2048,
+      "format": "uri"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["webpage", "document", "feed", "api"]
+    },
+    "last_fetched": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "content_hash": {
+      "type": "string"
+    }
+  },
+  "required": ["title", "type"],
+  "additionalProperties": false
+}

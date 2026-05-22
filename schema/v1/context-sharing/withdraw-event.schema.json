@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hn2.github.io/uacp/schema/v1/context-sharing/withdraw-event",
+  "title": "UACP Withdraw Event",
+  "description": "Payload for a withdraw event — stops relay of an artifact from a scope.",
+  "type": "object",
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "const": "withdraw"
+    },
+    "artifact_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "from_scope_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": ["event_type", "artifact_id", "from_scope_id"],
+  "additionalProperties": false
+}

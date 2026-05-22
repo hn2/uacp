@@ -41,7 +41,7 @@ A UACP conversation is a JSON object:
 
 ```json
 {
-  "uacp": "0.5.0",
+  "uacp": "0.6.0",
   "id": "conv_a1b2c3d4",
   "tool": "chatgpt",
   "model": "gpt-4o",
@@ -326,7 +326,7 @@ For tools that support structured context (MCP, system prompts):
 
 ```json
 {
-  "uacp_context": "0.4.0",
+  "uacp_context": "0.6.0",
   "injected_at": "2026-04-16T10:00:00Z",
   "conversations": [
     {
@@ -350,7 +350,7 @@ A UACP export is a `.uacp.json` file containing an array of conversations:
 
 ```json
 {
-  "uacp_export": "0.4.0",
+  "uacp_export": "0.6.0",
   "exported_at": "2026-04-16T12:00:00Z",
   "source": "my-tool-name",
   "conversations": [
@@ -450,7 +450,7 @@ Implementations declare which optional extensions they use via the top-level `ex
 
 ```json
 {
-  "uacp": "0.5.0",
+  "uacp": "0.6.0",
   "id": "conv_abc",
   "tool": "my-tool",
   "extensions": ["uacp-encryption"],
@@ -753,7 +753,7 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 
 ```json
 {
-  "uacp": "0.5.0",
+  "uacp": "0.6.0",
   "id": "conv_2026042101",
   "tool": "claude-code",
   "model": { "id": "claude-sonnet-4-6", "provider": "anthropic", "snapshot_date": "2026-04-21" },
@@ -827,11 +827,29 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 *Community specification — see GOVERNANCE.md*
 *Created: 2026-04-17 | Updated: 2026-05-07 (v0.5.0)*
 
+## Context-sharing primitives
+
+Context-sharing envelopes carry signed, scoped events between devices and vendors. Each event is wrapped in a `signed-event-envelope` — an ed25519-signed container that includes a vector clock for ordering, a scope identifier for access control, and a canonical-JSON signature for integrity. The schemas under `schema/v1/context-sharing/` define the structural contract; `signing.js` provides the crypto primitives.
+
+```javascript
+const { verifySignedEvent, canonicalJSON } = require('./signing')
+
+// Verify a signed event received from another device or vendor
+const result = verifySignedEvent(envelope, { publicKey: senderPublicKeyBase64 })
+if (!result.valid) throw new Error(result.error)
+```
+
+Run `node validate.js` to validate context-sharing conformance vectors (structural + ed25519 signature verification). Pass `--skip-crypto` to run structural-only checks in environments without native bindings.
+
 ## 18. Validation And Boundary
 
 - Run `node validate.js` for a fast conformance pre-check over `test-vectors/`.
 - Run `node conformance/harness/run.js` for the full conformance suite (core + extensions).
 - See [docs/UACP-BOUNDARY.md](docs/UACP-BOUNDARY.md) for the canonical boundary between UACP core, extensions, and implementation-specific concerns.
+
+### Validating UACP documents
+
+When an artifact envelope includes a `kind` and `body`, `validate.js` automatically validates the `body` against the matching kind schema from `schema/v1/kinds/` (e.g. `memory`, `persona`, `playbook`) and surfaces any errors with the path prefix `body/`.
 
 
 

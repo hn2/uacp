@@ -129,10 +129,18 @@ Implementations declare extensions via the top-level `extensions` array:
 | Implementation | Language | Level | Extensions | Verified | Notes |
 |---|---|---|---|---|---|
 | UACP reference harness | JavaScript (Node.js) | L3 | uacp-encryption | 2026-05-07 | Ships with this repo at `conformance/harness/`. |
+| `@fusionlayer/uacp` | TypeScript | L1, L2 | — | 2026-05-17 | `reference-impls/typescript/`. Report: `conformance/reports/typescript-v1.md`. |
+| `github.com/hn2/uacp/reference-impls/go` | Go | L1 | — | 2026-05-17 | `reference-impls/go/`. Report: `conformance/reports/go-v1.md`. |
+| `uacp` (PyPI) | Python | L1 | — | 2026-05-17 | `reference-impls/python/`. Report: `conformance/reports/python-v1.md`. |
 
 Implementations submit entries via PR against this file. The PR MUST include
 a harness log showing all tests passing, the harness commit SHA, and the
 impl SHA tested.
+
+## 7. Machine-readable registry
+
+A machine-readable version of the verified implementations table is maintained at
+`conformance/registry.json`. The schema identifier is `uacp-conformance-registry/v1`.
 
 ---
 
