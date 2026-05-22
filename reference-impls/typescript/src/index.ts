@@ -19,6 +19,5 @@ export type {
   TokenUsage,
   ToolCall,
   Extension,
-  PrivacyMode,
   ValidationResult,
 } from './types.js'

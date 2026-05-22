@@ -37,10 +37,6 @@ var validMsgStatus = map[string]bool{
 	"complete": true, "in_progress": true, "error": true,
 }
 
-var validPrivacy = map[string]bool{
-	"private": true, "personal": true, "team": true, "public": true,
-}
-
 var validProvenance = map[string]bool{
 	"extracted": true, "inferred": true, "system": true, "tool_output": true,
 }
@@ -49,7 +45,7 @@ var validRootKeys = map[string]bool{
 	"uacp": true, "id": true, "tool": true, "tool_chain": true, "model": true,
 	"title": true, "extensions": true, "created_at": true, "updated_at": true,
 	"tags": true, "project": true, "branches": true, "messages": true,
-	"metadata": true, "privacy": true,
+	"metadata": true,
 }
 
 var validMsgKeys = map[string]bool{
@@ -140,12 +136,6 @@ func Validate(doc any) Result {
 			for i, msg := range msgs {
 				validateMessage(msg, i, &errors)
 			}
-		}
-	}
-
-	if privacy, ok := m["privacy"].(string); ok {
-		if !validPrivacy[privacy] {
-			errors = append(errors, fmt.Sprintf("privacy: must be one of %s", joinSorted(validPrivacy)))
 		}
 	}
 

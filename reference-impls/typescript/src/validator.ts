@@ -1,7 +1,6 @@
 import type { UACPDocument, ValidationResult } from './types.js'
 
 const VALID_ROLES = new Set(['user', 'assistant', 'system', 'tool'])
-const VALID_PRIVACY = new Set(['private', 'personal', 'team', 'public'])
 const VALID_MSG_STATUS = new Set(['complete', 'in_progress', 'error'])
 const VALID_CONTENT_TYPES = new Set([
   'text', 'image', 'file', 'code', 'thinking', 'artifact_ref', 'audio', 'video', 'pdf', 'latex',
@@ -15,7 +14,7 @@ const HTTPS_RE = /^https?:\/\//
 const VALID_ROOT_KEYS = new Set([
   'uacp', 'id', 'tool', 'tool_chain', 'model', 'title', 'extensions',
   'created_at', 'updated_at', 'tags', 'project', 'branches', 'messages',
-  'metadata', 'privacy',
+  'metadata',
 ])
 
 const VALID_MSG_KEYS = new Set([
@@ -284,10 +283,6 @@ export function validate(doc: unknown): ValidationResult {
     errors.push('messages: must contain at least one message')
   } else {
     ;(doc.messages as unknown[]).forEach((msg, i) => validateMessage(msg, i, errors))
-  }
-
-  if (doc.privacy !== undefined && !VALID_PRIVACY.has(doc.privacy as string)) {
-    errors.push(`privacy: must be one of ${[...VALID_PRIVACY].join(', ')}`)
   }
 
   if (doc.created_at !== undefined && !ISO8601_RE.test(doc.created_at as string)) {
