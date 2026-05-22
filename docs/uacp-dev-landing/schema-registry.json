@@ -1,13 +1,20 @@
 {
-  "version": "1.1.0",
-  "updated_at": "2026-05-21",
+  "version": "1.2.0",
+  "updated_at": "2026-05-22",
   "schemas": [
     {
-      "id": "uacp-envelope-v1",
-      "url": "https://raw.githubusercontent.com/hn2/uacp/master/spec/v1/envelope.schema.json",
-      "description": "UACP envelope v1 — context-only, subject/audience/scope permissions model",
-      "status": "stable",
-      "spec": "https://github.com/hn2/uacp/blob/master/spec/v1/UACP-CORE.md"
+      "id": "uacp-core-v1",
+      "url": "https://uacp.dev/schema/v1/core",
+      "description": "UACP Core v1 envelope — context-only, subject/audience/scope permissions model",
+      "status": "draft",
+      "spec": "https://uacp.dev/spec/"
+    },
+    {
+      "id": "uacp-signing-v1",
+      "url": "https://uacp.dev/schema/v1/signing",
+      "description": "UACP Signing U1 — Ed25519 request signing, key registration, revocation",
+      "status": "draft",
+      "spec": "https://uacp.dev/spec/"
     },
     {
       "id": "uacp-trace-v2",
