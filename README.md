@@ -41,7 +41,7 @@ A UACP conversation is a JSON object:
 
 ```json
 {
-  "uacp": "0.5.0",
+  "uacp": "0.6.0",
   "id": "conv_a1b2c3d4",
   "tool": "chatgpt",
   "model": "gpt-4o",
@@ -326,7 +326,7 @@ For tools that support structured context (MCP, system prompts):
 
 ```json
 {
-  "uacp_context": "0.4.0",
+  "uacp_context": "0.6.0",
   "injected_at": "2026-04-16T10:00:00Z",
   "conversations": [
     {
@@ -350,7 +350,7 @@ A UACP export is a `.uacp.json` file containing an array of conversations:
 
 ```json
 {
-  "uacp_export": "0.4.0",
+  "uacp_export": "0.6.0",
   "exported_at": "2026-04-16T12:00:00Z",
   "source": "my-tool-name",
   "conversations": [
@@ -450,7 +450,7 @@ Implementations declare which optional extensions they use via the top-level `ex
 
 ```json
 {
-  "uacp": "0.5.0",
+  "uacp": "0.6.0",
   "id": "conv_abc",
   "tool": "my-tool",
   "extensions": ["uacp-encryption"],
@@ -753,7 +753,7 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 
 ```json
 {
-  "uacp": "0.5.0",
+  "uacp": "0.6.0",
   "id": "conv_2026042101",
   "tool": "claude-code",
   "model": { "id": "claude-sonnet-4-6", "provider": "anthropic", "snapshot_date": "2026-04-21" },
