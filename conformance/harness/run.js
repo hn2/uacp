@@ -50,6 +50,7 @@ function detectSchemaId(doc) {
 
 function resolveValidationTarget(doc) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
     return {
@@ -68,6 +69,17 @@ function resolveValidationTarget(doc) {
     return {
       schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
       target: doc.event,
+=======
+  if (doc && typeof doc.fixture_id === 'string') {
+    if (doc.event && typeof doc.event === 'object') {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
+    }
+    if (Array.isArray(doc.registrations) && doc.registrations.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration', target: doc.registrations[0] }
+    }
+    if (doc.payload && typeof doc.payload === 'object' && doc.payload.algorithm) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload }
+>>>>>>> origin/spec/43-encryption-envelope
     }
   }
   return { schemaId: detectSchemaId(doc), target: doc }
