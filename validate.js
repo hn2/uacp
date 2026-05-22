@@ -68,9 +68,13 @@ function detectKindSchemaId(doc) {
 
 // Extension fixture format: { fixture_id, ..., expected } — used by extension test vectors.
 // Each fixture uses a distinct field name to identify the schema target.
+// Any expected value other than "valid" is treated as an expected schema failure.
 function resolveExtensionFixture(doc) {
   if (!doc || typeof doc.fixture_id !== 'string') return null
-  const expectInvalid = doc.expected === 'invalid' || doc.expected === 'schema_error'
+  // Only treat as schema failure if explicitly marked as schema error or a known schema-level error code.
+  // Semantic error codes (INVALID_SIGNATURE, DECRYPT_FAILED, etc.) pass schema validation.
+  const SCHEMA_FAIL_CODES = new Set(['invalid', 'schema_error', 'UNKNOWN_ROLE', 'UNKNOWN_AXIS_VALUE', 'MISSING_AXIS', 'INVALID_SCOPE_ID'])
+  const expectInvalid = SCHEMA_FAIL_CODES.has(doc.expected)
   if (doc.event && typeof doc.event === 'object') {
     return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event, expectInvalid }
   }
@@ -88,6 +92,12 @@ function resolveExtensionFixture(doc) {
   }
   if (doc.member_set && typeof doc.member_set === 'object') {
     return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_set, expectInvalid }
+  }
+  if (Array.isArray(doc.member_sets) && doc.member_sets.length > 0) {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_sets[0], expectInvalid }
+  }
+  if (Array.isArray(doc.scopes) && doc.scopes.length > 0) {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0], expectInvalid }
   }
   if (doc.promotion && typeof doc.promotion === 'object') {
     return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-promotion-event', target: doc.promotion, expectInvalid }
