@@ -66,6 +66,18 @@ function detectKindSchemaId(doc) {
   return null
 }
 
+// Extension fixture format: { fixture_id, event, expected } — used by sync-event test vectors.
+function resolveExtensionFixture(doc) {
+  if (doc && typeof doc.fixture_id === 'string' && doc.event && typeof doc.event === 'object') {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
+      target: doc.event,
+      expectInvalid: doc.expected === 'invalid',
+    }
+  }
+  return null
+}
+
 // Context-sharing kind names that map to schema/v1/context-sharing/
 const CONTEXT_SHARING_KINDS = new Set([
   'signed-event-envelope',
@@ -198,6 +210,34 @@ function main() {
             } else {
               reason = errors.map(e => `body/${(e.instancePath || '').replace(/^\//, '')} ${e.message}`.trim()).join('; ')
             }
+            console.error(`✗ ${name}: ${reason}`)
+          }
+        }
+        continue
+      }
+
+      // Extension fixture format: { fixture_id, event, expected }
+      const extFixture = resolveExtensionFixture(doc)
+      if (extFixture) {
+        const { schemaId: extSchemaId, target: extTarget, expectInvalid: extExpect } = extFixture
+        const extValid = ajv.validate(extSchemaId, extTarget)
+        const extErrors = ajv.errors || []
+        if (extExpect) {
+          if (!extValid) {
+            passed += 1
+            const reason = extErrors.map(e => `${e.instancePath || '(root)'} ${e.message}`).join('; ')
+            console.log(`✓ ${name} (expected invalid — ${reason})`)
+          } else {
+            failed += 1
+            console.error(`✗ ${name}: expected validation failure but document passed`)
+          }
+        } else {
+          if (extValid) {
+            passed += 1
+            console.log(`✓ ${name}`)
+          } else {
+            failed += 1
+            const reason = extErrors.map(e => `${e.instancePath || '(root)'} ${e.message}`).join('; ')
             console.error(`✗ ${name}: ${reason}`)
           }
         }
