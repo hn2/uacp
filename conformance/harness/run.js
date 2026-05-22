@@ -53,6 +53,7 @@ function resolveValidationTarget(doc) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
     return {
@@ -76,6 +77,8 @@ function resolveValidationTarget(doc) {
 >>>>>>> origin/spec/37-vector-clock
 =======
 >>>>>>> origin/spec/38-scope-identifier
+=======
+>>>>>>> origin/spec/39-member-set
   if (doc && typeof doc.fixture_id === 'string') {
     if (doc.event && typeof doc.event === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
@@ -87,6 +90,7 @@ function resolveValidationTarget(doc) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> origin/spec/43-encryption-envelope
 =======
     }
@@ -94,13 +98,26 @@ function resolveValidationTarget(doc) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
 >>>>>>> origin/spec/37-vector-clock
 =======
+=======
+>>>>>>> origin/spec/39-member-set
     }
     if (doc.clocks && Array.isArray(doc.clocks)) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
     }
+<<<<<<< HEAD
     if (doc.scopes && Array.isArray(doc.scopes) && doc.scopes.length > 0) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0] }
 >>>>>>> origin/spec/38-scope-identifier
+=======
+    if (doc.scopes && Array.isArray(doc.scopes)) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0] }
+    }
+    if (doc.member_set && typeof doc.member_set === 'object') {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_set }
+    }
+    if (Array.isArray(doc.member_sets) && doc.member_sets.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_sets[0] }
+>>>>>>> origin/spec/39-member-set
     }
   }
   return { schemaId: detectSchemaId(doc), target: doc }
@@ -168,8 +185,14 @@ async function runConformance({ level = 'L3', impl } = {}) {
       continue
     }
 
+<<<<<<< HEAD
     const expectInvalid = doc?.metadata?.['uacp.test.expect'] === 'invalid' ||
       (typeof doc?.expected === 'string' && doc.expected !== 'valid')
+=======
+    const schemaErrorCodes = new Set(['invalid', 'UNKNOWN_ROLE'])
+    const expectInvalid = (doc?.metadata?.['uacp.test.expect'] === 'invalid') ||
+      (doc?.fixture_id && schemaErrorCodes.has(doc?.expected))
+>>>>>>> origin/spec/39-member-set
     const { valid, errors } = validateDoc(ajv, doc)
 
     if (expectInvalid) {
