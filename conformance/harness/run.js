@@ -49,6 +49,21 @@ function detectSchemaId(doc) {
 }
 
 function resolveValidationTarget(doc) {
+<<<<<<< HEAD
+=======
+  if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration',
+      target: doc.registrations[0],
+    }
+  }
+  if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.identity_keys) && doc.identity_keys.length > 0) {
+    return {
+      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-identity-key',
+      target: doc.identity_keys[0],
+    }
+  }
+>>>>>>> origin/spec/42-identity-device-key-chain
   if (doc && typeof doc.fixture_id === 'string' && doc.event && typeof doc.event === 'object') {
     return {
       schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
