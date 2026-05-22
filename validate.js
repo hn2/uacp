@@ -66,14 +66,37 @@ function detectKindSchemaId(doc) {
   return null
 }
 
-// Extension fixture format: { fixture_id, event, expected } — used by sync-event test vectors.
+// Extension fixture format: { fixture_id, ..., expected } — used by extension test vectors.
+// Each fixture uses a distinct field name to identify the schema target.
 function resolveExtensionFixture(doc) {
-  if (doc && typeof doc.fixture_id === 'string' && doc.event && typeof doc.event === 'object') {
-    return {
-      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
-      target: doc.event,
-      expectInvalid: doc.expected === 'invalid',
-    }
+  if (!doc || typeof doc.fixture_id !== 'string') return null
+  const expectInvalid = doc.expected === 'invalid' || doc.expected === 'schema_error'
+  if (doc.event && typeof doc.event === 'object') {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event, expectInvalid }
+  }
+  if (Array.isArray(doc.registrations) && doc.registrations.length > 0) {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration', target: doc.registrations[0], expectInvalid }
+  }
+  if (Array.isArray(doc.identity_keys) && doc.identity_keys.length > 0) {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-identity-key', target: doc.identity_keys[0], expectInvalid }
+  }
+  if (doc.payload && typeof doc.payload === 'object' && doc.payload.algorithm) {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload, expectInvalid }
+  }
+  if (doc.clocks && Array.isArray(doc.clocks) && doc.clocks.length > 0) {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0], expectInvalid }
+  }
+  if (doc.member_set && typeof doc.member_set === 'object') {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_set, expectInvalid }
+  }
+  if (doc.promotion && typeof doc.promotion === 'object') {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-promotion-event', target: doc.promotion, expectInvalid }
+  }
+  if (doc.withdraw && typeof doc.withdraw === 'object') {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-withdraw-event', target: doc.withdraw, expectInvalid }
+  }
+  if (doc.audit_event && typeof doc.audit_event === 'object') {
+    return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-audit-event', target: doc.audit_event, expectInvalid }
   }
   return null
 }
