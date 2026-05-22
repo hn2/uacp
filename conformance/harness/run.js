@@ -52,6 +52,7 @@ function resolveValidationTarget(doc) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
     return {
@@ -73,6 +74,8 @@ function resolveValidationTarget(doc) {
 =======
 =======
 >>>>>>> origin/spec/37-vector-clock
+=======
+>>>>>>> origin/spec/38-scope-identifier
   if (doc && typeof doc.fixture_id === 'string') {
     if (doc.event && typeof doc.event === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
@@ -83,12 +86,21 @@ function resolveValidationTarget(doc) {
     if (doc.payload && typeof doc.payload === 'object' && doc.payload.algorithm) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload }
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> origin/spec/43-encryption-envelope
 =======
     }
     if (doc.clocks && Array.isArray(doc.clocks) && doc.clocks.length > 0) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
 >>>>>>> origin/spec/37-vector-clock
+=======
+    }
+    if (doc.clocks && Array.isArray(doc.clocks)) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
+    }
+    if (doc.scopes && Array.isArray(doc.scopes) && doc.scopes.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0] }
+>>>>>>> origin/spec/38-scope-identifier
     }
   }
   return { schemaId: detectSchemaId(doc), target: doc }
@@ -156,7 +168,8 @@ async function runConformance({ level = 'L3', impl } = {}) {
       continue
     }
 
-    const expectInvalid = doc?.metadata?.['uacp.test.expect'] === 'invalid'
+    const expectInvalid = doc?.metadata?.['uacp.test.expect'] === 'invalid' ||
+      (typeof doc?.expected === 'string' && doc.expected !== 'valid')
     const { valid, errors } = validateDoc(ajv, doc)
 
     if (expectInvalid) {
