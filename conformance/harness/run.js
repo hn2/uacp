@@ -39,6 +39,24 @@ function loadAjv() {
     }
   }
 
+  const kindSchemaDir = path.join(SCHEMA_DIR, 'v1', 'kinds')
+  if (fs.existsSync(kindSchemaDir)) {
+    for (const name of fs.readdirSync(kindSchemaDir)) {
+      if (!name.endsWith('.schema.json')) continue
+      const schema = JSON.parse(fs.readFileSync(path.join(kindSchemaDir, name), 'utf8'))
+      if (schema['$id']) ajv.addSchema(schema, schema['$id'])
+    }
+  }
+
+  const contextSchemaDir = path.join(SCHEMA_DIR, 'v1', 'context-sharing')
+  if (fs.existsSync(contextSchemaDir)) {
+    for (const name of fs.readdirSync(contextSchemaDir)) {
+      if (!name.endsWith('.schema.json')) continue
+      const schema = JSON.parse(fs.readFileSync(path.join(contextSchemaDir, name), 'utf8'))
+      if (schema['$id']) ajv.addSchema(schema, schema['$id'])
+    }
+  }
+
   return ajv
 }
 
@@ -49,45 +67,6 @@ function detectSchemaId(doc) {
 }
 
 function resolveValidationTarget(doc) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
-    return {
-      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration',
-      target: doc.registrations[0],
-    }
-  }
-  if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.identity_keys) && doc.identity_keys.length > 0) {
-    return {
-      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-identity-key',
-      target: doc.identity_keys[0],
-    }
-  }
->>>>>>> origin/spec/42-identity-device-key-chain
-  if (doc && typeof doc.fixture_id === 'string' && doc.event && typeof doc.event === 'object') {
-    return {
-      schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
-      target: doc.event,
-=======
-=======
->>>>>>> origin/spec/37-vector-clock
-=======
->>>>>>> origin/spec/38-scope-identifier
-=======
->>>>>>> origin/spec/39-member-set
-=======
->>>>>>> origin/spec/40-promotion-event
-=======
->>>>>>> origin/spec/44-audit-hash-chain
-=======
->>>>>>> origin/spec/45-conformance-fixtures
   if (doc && typeof doc.fixture_id === 'string') {
     if (doc.event && typeof doc.event === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
@@ -95,73 +74,32 @@ function resolveValidationTarget(doc) {
     if (Array.isArray(doc.registrations) && doc.registrations.length > 0) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-device-registration', target: doc.registrations[0] }
     }
+    if (Array.isArray(doc.identity_keys) && doc.identity_keys.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-identity-key', target: doc.identity_keys[0] }
+    }
     if (doc.payload && typeof doc.payload === 'object' && doc.payload.algorithm) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> origin/spec/43-encryption-envelope
-=======
     }
     if (doc.clocks && Array.isArray(doc.clocks) && doc.clocks.length > 0) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
->>>>>>> origin/spec/37-vector-clock
-=======
-=======
->>>>>>> origin/spec/39-member-set
     }
-    if (doc.clocks && Array.isArray(doc.clocks)) {
-      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
-    }
-<<<<<<< HEAD
-    if (doc.scopes && Array.isArray(doc.scopes) && doc.scopes.length > 0) {
+    if (Array.isArray(doc.scopes) && doc.scopes.length > 0) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0] }
->>>>>>> origin/spec/38-scope-identifier
-=======
-    if (doc.scopes && Array.isArray(doc.scopes)) {
-      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-scope-identifier', target: doc.scopes[0] }
-=======
->>>>>>> origin/spec/40-promotion-event
-=======
->>>>>>> origin/spec/44-audit-hash-chain
-=======
->>>>>>> origin/spec/45-conformance-fixtures
     }
     if (doc.member_set && typeof doc.member_set === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_set }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     if (Array.isArray(doc.member_sets) && doc.member_sets.length > 0) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-member-set', target: doc.member_sets[0] }
->>>>>>> origin/spec/39-member-set
-=======
-=======
->>>>>>> origin/spec/44-audit-hash-chain
-=======
->>>>>>> origin/spec/45-conformance-fixtures
+    }
     if (doc.promotion && typeof doc.promotion === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-promotion-event', target: doc.promotion }
     }
     if (doc.withdraw && typeof doc.withdraw === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-withdraw-event', target: doc.withdraw }
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> origin/spec/40-promotion-event
-=======
     }
     if (doc.audit_event && typeof doc.audit_event === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-audit-event', target: doc.audit_event }
->>>>>>> origin/spec/44-audit-hash-chain
-=======
-    }
-    if (doc.audit_event && typeof doc.audit_event === 'object') {
-      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-audit-event', target: doc.audit_event }
->>>>>>> origin/spec/45-conformance-fixtures
     }
   }
   return { schemaId: detectSchemaId(doc), target: doc }
@@ -181,6 +119,9 @@ const LEVEL_VECTORS = {
   L3: ['07-extended-thinking.uacp.json', '08-with-citations.uacp.json', '09-encrypted-envelope.uacp.json',
        '13-deep-branches.uacp.json', '14-tool-call-correlation.uacp.json', '15-redactions-and-metadata.uacp.json'],
 }
+
+// Semantic error codes that pass schema validation (not schema failures)
+const SCHEMA_FAIL_CODES = new Set(['invalid', 'schema_error', 'UNKNOWN_ROLE', 'UNKNOWN_AXIS_VALUE', 'MISSING_AXIS', 'INVALID_SCOPE_ID'])
 
 async function runConformance({ level = 'L3', impl } = {}) {
   const ajv = loadAjv()
@@ -229,29 +170,8 @@ async function runConformance({ level = 'L3', impl } = {}) {
       continue
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    const expectInvalid = doc?.metadata?.['uacp.test.expect'] === 'invalid' ||
-      (typeof doc?.expected === 'string' && doc.expected !== 'valid')
-=======
-    const schemaErrorCodes = new Set(['invalid', 'UNKNOWN_ROLE'])
     const expectInvalid = (doc?.metadata?.['uacp.test.expect'] === 'invalid') ||
-      (doc?.fixture_id && schemaErrorCodes.has(doc?.expected))
->>>>>>> origin/spec/39-member-set
-=======
-    const expectInvalid = (doc?.metadata?.['uacp.test.expect'] === 'invalid') ||
-      (doc?.fixture_id && doc?.expected === 'schema_error')
->>>>>>> origin/spec/40-promotion-event
-=======
-    const expectInvalid = (doc?.metadata?.['uacp.test.expect'] === 'invalid') ||
-      (doc?.fixture_id && doc?.expected === 'schema_error')
->>>>>>> origin/spec/44-audit-hash-chain
-=======
-    const expectInvalid = (doc?.metadata?.['uacp.test.expect'] === 'invalid') ||
-      (doc?.fixture_id && doc?.expected === 'schema_error')
->>>>>>> origin/spec/45-conformance-fixtures
+      (doc?.fixture_id && SCHEMA_FAIL_CODES.has(doc?.expected))
     const { valid, errors } = validateDoc(ajv, doc)
 
     if (expectInvalid) {
