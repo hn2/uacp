@@ -51,6 +51,7 @@ function detectSchemaId(doc) {
 function resolveValidationTarget(doc) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   if (doc && typeof doc.fixture_id === 'string' && Array.isArray(doc.registrations) && doc.registrations.length > 0) {
     return {
@@ -70,6 +71,8 @@ function resolveValidationTarget(doc) {
       schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event',
       target: doc.event,
 =======
+=======
+>>>>>>> origin/spec/37-vector-clock
   if (doc && typeof doc.fixture_id === 'string') {
     if (doc.event && typeof doc.event === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
@@ -79,7 +82,13 @@ function resolveValidationTarget(doc) {
     }
     if (doc.payload && typeof doc.payload === 'object' && doc.payload.algorithm) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-event-payload', target: doc.payload }
+<<<<<<< HEAD
 >>>>>>> origin/spec/43-encryption-envelope
+=======
+    }
+    if (doc.clocks && Array.isArray(doc.clocks) && doc.clocks.length > 0) {
+      return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vector-clock', target: doc.clocks[0] }
+>>>>>>> origin/spec/37-vector-clock
     }
   }
   return { schemaId: detectSchemaId(doc), target: doc }
