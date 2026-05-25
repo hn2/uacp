@@ -1,6 +1,13 @@
 # Unified AI Context Protocol (UACP) — Specification v0.6.0
 
-**UACP Core v0.5.0 — vendor-neutral conversation format. Optional encryption envelope extension (`uacp-encryption`) for interoperable encrypted interchange.**
+[![npm version](https://img.shields.io/npm/v/uacp.svg)](https://www.npmjs.com/package/uacp)
+[![CI](https://github.com/hn2/uacp/actions/workflows/validate.yml/badge.svg)](https://github.com/hn2/uacp/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Spec version](https://img.shields.io/badge/spec-v0.6.0-brightgreen.svg)](docs/RELEASE-NOTES-v0.6.0.md)
+
+**Vendor-neutral conversation format. Adopted by FusionLayer engine.**
+
+UACP Core v0.6.0 — vendor-neutral conversation format. Optional encryption envelope extension (`uacp-encryption`) for interoperable encrypted interchange.
 
 
 Relationship and boundary guidance with ACP: [docs/ACP-UACP-RELATIONSHIP.md](docs/ACP-UACP-RELATIONSHIP.md)
