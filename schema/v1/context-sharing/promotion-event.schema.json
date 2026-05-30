@@ -1,35 +1,6 @@
 {
+  "$comment": "DEPRECATED: use schema/extensions/uacp-promotion-event.schema.json. The canonical schema is https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-promotion-event.",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://hn2.github.io/uacp/schema/v1/context-sharing/promotion-event",
-  "title": "UACP Promotion Event",
-  "description": "Payload for a promotion event — moves an artifact from a lower-trust scope to a higher-trust scope.",
-  "type": "object",
-  "properties": {
-    "event_type": {
-      "type": "string",
-      "const": "promotion"
-    },
-    "artifact_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "from_scope_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "to_scope_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "re_encrypted_body": {
-      "type": "string",
-      "pattern": "^[A-Za-z0-9+/]+={0,2}$"
-    },
-    "scope_key_id_used": {
-      "type": "string",
-      "format": "uuid"
-    }
-  },
-  "required": ["event_type", "artifact_id", "from_scope_id", "to_scope_id", "re_encrypted_body", "scope_key_id_used"],
-  "additionalProperties": false
+  "$ref": "https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-promotion-event"
 }

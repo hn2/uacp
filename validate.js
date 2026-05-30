@@ -51,7 +51,7 @@ function loadSchemas() {
 
 function detectSchemaId(doc) {
   if (doc && typeof doc.uacp_encrypted === 'string') {
-    return 'https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption'
+    return 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-encryption'
   }
   if (doc && typeof doc.uacp_export === 'string') {
     return 'https://hn2.github.io/uacp/schema/0.6.0/export'

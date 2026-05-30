@@ -7,7 +7,7 @@ const VALID_CONTENT_TYPES = new Set([
 ])
 const VALID_ARTIFACT_TYPES = new Set(['code', 'html', 'svg', 'markdown', 'react', 'text'])
 const SEMVER_RE = /^\d+\.\d+\.\d+$/
-const ISO8601_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+const ISO8601_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/
 const SHA256_RE = /^[a-f0-9]{64}$/
 const HTTPS_RE = /^https?:\/\//
 

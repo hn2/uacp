@@ -1,3 +1,5 @@
+> **DEPRECATED:** This spec describes the v1 withdraw-event format which has been superseded. Use `schema/extensions/uacp-withdraw-event.schema.json` (`$id`: `https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-withdraw-event`) for all new work. The v1 schema now redirects to the extensions canonical schema via `$ref`.
+
 # Withdraw Event v1
 
 A withdraw event stops relay of an artifact from a scope.

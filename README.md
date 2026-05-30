@@ -124,13 +124,12 @@ A UACP conversation is a JSON object:
 | `model` | string or object | Model for this specific message (see §2.6) |
 | `tokens` | object | `{ input, output }` token counts |
 | `tool_calls` | array | Tool/function calls made |
-| `tool_results` | array | Results from tool calls |
 | `attachments` | array | Files, images, etc. |
 | `parent_id` | string | ID of parent message for branched conversations (see §2.1) |
 | `status` | string | `complete` (default), `in_progress`, or `error` (see §2.5) |
 | `citations` | array | Source citations on assistant messages (see §2.3) |
 | `artifacts` | array | Generated artifacts on assistant messages (see §2.4) |
-| `redactions` | object | DLP redaction metadata: `{ count, categories: string[], placeholders: string[] }` |
+| `redactions` | object | DLP redaction metadata: `{ count, categories?: string[], placeholder_format: string }` |
 | `metadata` | object | Tool-specific data |
 
 ### Content Types
@@ -728,9 +727,8 @@ UACP tool calls and MCP (Model Context Protocol) tool invocations represent the 
 |---|---|
 | `tool_calls[].name` | `tool.name` |
 | `tool_calls[].arguments` | `tool.input` (object) |
-| `tool_calls[].id` | Correlation ID (MCP `toolUseId`) |
-| `role: "tool"` message | MCP `tool_result` block |
-| `tool_results[].tool_call_id` | MCP `toolUseId` |
+| `tool_calls[].call_id` | Correlation ID (MCP `toolUseId`) |
+| `role: "tool"` message + `call_id` | MCP `tool_result` block + `toolUseId` |
 
 UACP conversations captured from MCP-enabled tools (Claude Code, Continue.dev) SHOULD map MCP tool_result blocks to the `role: "tool"` message form.
 

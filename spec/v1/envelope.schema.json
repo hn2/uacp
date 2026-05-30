@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://uacp.dev/spec/v1/envelope",
   "title": "UACP Envelope v0.2",
   "description": "JSON Schema for the UACP v1 artifact envelope (spec v0.2). Sub-specs define the body field. Implementations MUST NOT accept uacp_version > 1.",

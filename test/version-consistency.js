@@ -32,4 +32,15 @@ if (!readmeLine.includes(version)) {
   fail(`README.md title does not mention version ${version}: ${readmeLine.trim()}`)
 }
 
-console.log(`OK — version ${version} consistent across package.json, schema $id, and README title.`)
+// All extension schemas must have $id containing the current version
+const extDir = path.join(ROOT, 'schema', 'extensions')
+const extSchemas = fs.readdirSync(extDir).filter(n => n.endsWith('.schema.json'))
+for (const name of extSchemas) {
+  const ext = JSON.parse(fs.readFileSync(path.join(extDir, name), 'utf8'))
+  const id = ext['$id'] ?? ''
+  if (!id.includes(version)) {
+    fail(`schema/extensions/${name} $id does not contain version ${version}: ${id}`)
+  }
+}
+
+console.log(`OK — version ${version} consistent across package.json, schema $id, README title, and ${extSchemas.length} extension schemas.`)

@@ -11,7 +11,7 @@
     },
     "scope_type": {
       "type": "string",
-      "enum": ["personal", "team", "corporate", "family"]
+      "enum": ["personal", "team", "corporate"]
     },
     "governance_preset": {
       "type": "string",

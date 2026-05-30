@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hn2.github.io/uacp/schema/0.5.0/extensions/uacp-encryption",
+  "$id": "https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-encryption",
   "title": "UACP Encrypted Envelope",
-  "description": "AES-256-GCM sealed wrapper around a UACP Conversation Object. This is the uacp-encryption OPTIONAL extension (v0.5.0). Implementations that do not encrypt at the UACP layer never need this schema.",
+  "description": "AES-256-GCM sealed wrapper around a UACP Conversation Object. This is the uacp-encryption OPTIONAL extension (v0.6.0). Implementations that do not encrypt at the UACP layer never need this schema.",
   "type": "object",
   "required": ["uacp_encrypted", "algorithm", "iv", "auth_tag", "ciphertext", "key_derivation"],
   "additionalProperties": false,

@@ -1,3 +1,5 @@
+> **DEPRECATED:** This spec describes the v1 promotion-event format which has been superseded. Use `schema/extensions/uacp-promotion-event.schema.json` (`$id`: `https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-promotion-event`) for all new work. The v1 schema now redirects to the extensions canonical schema via `$ref`.
+
 # Promotion Event v1
 
 A promotion event moves an artifact from a lower-trust scope to a higher-trust scope.
