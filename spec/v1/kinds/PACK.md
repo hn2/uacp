@@ -83,8 +83,8 @@ body:
   artifact_refs:
     - kind: persona
       slug: persona-senior-engineer
-    - kind: rule
-      slug: rule-no-hardcoded-secrets
+    - kind: policy
+      slug: policy-no-hardcoded-secrets
     - kind: guideline
       slug: guideline-cite-sources
     - kind: memory
@@ -100,6 +100,7 @@ body:
 ## §5 — Notes
 
 - Packs do NOT embed artifact content — they reference artifacts. The engine resolves refs at load time.
+- Plain-language "rules" should be represented as `policy` artifacts when they enforce boundaries or redact content.
 - If an `id` is provided and the artifact does not exist in the engine, the engine MUST log a warning and skip the missing ref (not fail the whole pack load).
 - If a `slug` is provided, the engine uses its registry to resolve the slug to an artifact. If the slug is unknown, the engine MUST log a warning and skip it.
 - Packs are immutable once signed. To update a pack (e.g., add a new artifact ref), create a new version (`version: 1.1.0`).
