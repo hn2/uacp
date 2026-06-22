@@ -1,4 +1,4 @@
-# UACP Core Specification v0.2 (Draft)
+# UACP Core Specification v0.6.0
 
 **Universal AI Context Protocol (UACP) — Core Specification**
 

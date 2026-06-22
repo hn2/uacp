@@ -4,7 +4,7 @@
 |-------|-------|
 | Implementation | `@fusionlayer/uacp` |
 | Version | 0.6.0 |
-| UACP version | 1.0.0 |
+| UACP version | 0.6.0 |
 | Levels claimed | L1, L2 |
 | Date verified | 2026-05-17 |
 
