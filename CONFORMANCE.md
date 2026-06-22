@@ -1,7 +1,7 @@
 # UACP Conformance
 
 This document defines what it means for an implementation to conform to UACP
-v0.5.0, the interface a test harness expects, and the registry of verified
+v0.6.0, the interface a test harness expects, and the registry of verified
 implementations.
 
 ## 1. Conformance levels
