@@ -752,7 +752,7 @@ UACP conversations captured from MCP-enabled tools (Claude Code, Continue.dev) S
 
 ---
 
-## Appendix A: Full Example (v0.5.0)
+## Appendix A: Full Example (v0.6.0)
 
 This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3), an artifact (§2.4), and the expanded model field (§2.6).
 
@@ -828,9 +828,9 @@ This example uses branching (§2.1), extended thinking (§2.2), citations (§2.3
 
 ---
 
-*UACP Spec v0.5.0 - Draft*
+*UACP Spec v0.6.0 - Draft*
 *Community specification — see GOVERNANCE.md*
-*Created: 2026-04-17 | Updated: 2026-05-07 (v0.5.0)*
+*Created: 2026-04-17 | Updated: 2026-06-23 (v0.6.0)*
 
 ## Context-sharing primitives
 
