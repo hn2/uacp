@@ -56,7 +56,7 @@ A **Profile** is a named extension document that specifies additional fields and
 
 - MUST define a `$id` URI (e.g., `https://fusionlayer.app/uacp-profile/v1`)
 - MUST specify which UACP version it extends
-- MUST place all product-specific fields under a dedicated namespace key (e.g., `x-fusionlayer`, `x-cursor`, `x-yourproduct`)
+- MUST place all product-specific fields under a dedicated namespace key inside the core `metadata` object (e.g., `metadata["x-fusionlayer"]`, `metadata["x-cursor"]`, `metadata["x-yourproduct"]`) — `metadata` is the only place in `conversation.schema.json` where arbitrary additional properties are permitted; the document root has `unevaluatedProperties: false` and rejects unknown top-level keys, including `x-*` ones
 - MUST NOT redefine core UACP fields
 - MUST document which fields are required vs optional within the profile
 - SHOULD provide JSON Schema for profile-specific fields
@@ -66,32 +66,36 @@ A **Profile** is a named extension document that specifies additional fields and
 
 ```json
 {
-  "$schema": "https://uacp.dev/schema/v0.4.0/conversation.json",
-  "uacp_version": "0.4.0",
-  "profile": "https://fusionlayer.app/uacp-profile/v1",
-  "conversation_id": "...",
-  "messages": [...],
-  "x-fusionlayer": {
-    "storage_mode": "private",
-    "persona_id": "inkfold-default",
-    "routing_vendor": "anthropic",
-    "cost_usd": 0.0024
+  "uacp": "0.6.0",
+  "id": "conv_01j8x3z9k4h7m6n5p2q1r0s9t8",
+  "tool": "inkfold",
+  "messages": [
+    { "role": "user", "content": "..." }
+  ],
+  "metadata": {
+    "x-fusionlayer": {
+      "profile": "https://fusionlayer.app/uacp-profile/v1",
+      "storage_mode": "private",
+      "persona_id": "inkfold-default",
+      "routing_vendor": "anthropic",
+      "cost_usd": 0.0024
+    }
   }
 }
 ```
 
-A consumer that does not understand `x-fusionlayer` MUST ignore it and process the conversation using only core UACP fields.
+A consumer that does not understand `metadata["x-fusionlayer"]` MUST ignore it and process the conversation using only core UACP fields. Because `metadata` already permits arbitrary additional properties, this is satisfied automatically — no stripping is required for the document to remain schema-valid.
 
 ---
 
 ## 3. Standard Namespace Convention
 
-Profile implementors MUST use the `x-` prefix convention:
+Profile implementors MUST use the `x-` prefix convention, nested under the core `metadata` object:
 
 ```
-x-{vendor}          FusionLayer:  x-fusionlayer
-                    Cursor:       x-cursor
-                    Your product: x-yourproduct
+metadata["x-{vendor}"]          FusionLayer:  metadata["x-fusionlayer"]
+                                Cursor:       metadata["x-cursor"]
+                                Your product: metadata["x-yourproduct"]
 ```
 
 Keys inside the namespace are free-form but SHOULD follow the same naming conventions as core UACP (snake_case, descriptive names).
@@ -104,24 +108,24 @@ The table below shows how FusionLayer-specific fields map to the profile pattern
 
 | FusionLayer concept | Core UACP field | Profile field |
 |--------------------|-----------------|---------------|
-| Storage / sharing mode | — | `x-fusionlayer.privacy_mode` (product-specific; core has the optional `metadata.uacp_privacy.level` convention only) |
-| Active AI persona | — | `x-fusionlayer.persona_id` |
-| Vendor selection | — | `x-fusionlayer.routing_vendor` |
-| Cost per message | — | `x-fusionlayer.cost_usd` |
-| Pseudonymizer mode | — | `x-fusionlayer.pseudonymizer_mode` |
-| Team / workspace | — | `x-fusionlayer.workspace_id` |
-| Plan tier | — | `x-fusionlayer.plan` |
+| Storage / sharing mode | — | `metadata["x-fusionlayer"].privacy_mode` (product-specific; core has the optional `metadata.uacp_privacy.level` convention only) |
+| Active AI persona | — | `metadata["x-fusionlayer"].persona_id` |
+| Vendor selection | — | `metadata["x-fusionlayer"].routing_vendor` |
+| Cost per message | — | `metadata["x-fusionlayer"].cost_usd` |
+| Pseudonymizer mode | — | `metadata["x-fusionlayer"].pseudonymizer_mode` |
+| Team / workspace | — | `metadata["x-fusionlayer"].workspace_id` |
+| Plan tier | — | `metadata["x-fusionlayer"].plan` |
 
 ---
 
 ## 5. Interoperability Rule
 
-A UACP document that carries a Profile namespace extension MUST remain valid against core UACP schema after stripping all `x-*` keys. Implementors MUST verify this with the standard conformance harness:
+A UACP document that carries a Profile namespace extension MUST remain valid against the core UACP schema after stripping the profile's `metadata["x-*"]` keys. Because `metadata` already permits arbitrary additional properties, this holds by construction — the check below is a sanity guard, not a workaround. Implementors MUST verify this with the repo's validator:
 
 ```bash
-# Strip all x- keys and validate against core schema
-jq 'del(.. | objects | with_entries(select(.key | startswith("x-"))))' input.json \
-  | node conformance/validate.js --schema schema/conversation.json
+# Strip the x- namespace from metadata and validate against core schema
+jq 'del(.metadata["x-fusionlayer"])' input.json > /tmp/stripped.json
+node validate.js /tmp/stripped.json
 ```
 
 ---
