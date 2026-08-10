@@ -53,7 +53,15 @@ To claim level N, an implementation MUST pass every check below at or below N:
    AAD default = `"{uacp_encrypted}:{info}"` UTF-8 bytes when envelope `aad` is
    empty. This check is NOT required for L1, L2, or L3 — only for implementations
    that declare the `uacp-encryption` extension.
-8. **Negative cases** — the harness's negative test vectors (any file whose
+8. **Extension: uacp-vault-envelope** (optional) — if the implementation emits
+   vault envelopes, they MUST satisfy the field requirements in
+   `spec/extensions/uacp-vault-envelope.md`, including: every `bundles[]`
+   ciphertext decrypts to a valid Conversation Object; every entry `id` is
+   independent of any identifier in its own plaintext; `key_wrap.algorithm`
+   and `content_cipher.algorithm` are present and non-empty. This check is NOT
+   required for L1, L2, or L3 — only for implementations that declare the
+   `uacp-vault-envelope` extension.
+9. **Negative cases** — the harness's negative test vectors (any file whose
    inline `uacp.test.expect` is `"invalid"`) MUST be rejected.
 
 ## 3. Harness interface
@@ -119,6 +127,7 @@ All extensions are optional. An implementation declares what it supports; the ha
 | Extension ID | Schema | Spec | Test vectors | Issue | Description |
 |---|---|---|---|---|---|
 | `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | `spec/extensions/uacp-encryption.md` | — | — | Legacy AES-256-GCM + Argon2id envelope (v0.5.0) |
+| `uacp-vault-envelope` | `schema/extensions/uacp-vault-envelope.schema.json` | `spec/extensions/uacp-vault-envelope.md` | `test-vectors/extensions/vault-envelope/` | #96 | Multi-recipient encrypted container for one or more UACP bundles; crypto-agnostic (algorithm identifiers, not fixed) |
 | `uacp-sync-event` | `schema/extensions/uacp-sync-event.schema.json` | `spec/extensions/uacp-sync-event.md` | `test-vectors/extensions/sync-event/` | #36 | Ed25519-signed event envelope with vector clock |
 | `uacp-identity-key` | `schema/extensions/uacp-identity-key.schema.json` | `spec/extensions/uacp-identity-key.md` | `test-vectors/extensions/identity-chain/` | #42 | Ed25519 identity key |
 | `uacp-device-registration` | `schema/extensions/uacp-device-registration.schema.json` | — | `test-vectors/extensions/identity-chain/` | #42 | Device registration + retirement |

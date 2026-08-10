@@ -53,11 +53,13 @@ A document declares which extensions it uses via the top-level `extensions` arra
 | Extension | What it adds |
 |-----------|-------------|
 | `uacp-encryption` | AES-256-GCM envelope wrapping a conversation for at-rest/in-transit encryption. |
+| `uacp-vault-envelope` | Multi-recipient encrypted container wrapping one or more UACP bundles under a shared, per-recipient-wrapped content key. Crypto-agnostic: key-wrap and content-cipher algorithms are declared identifiers, not fixed by the spec. |
 
 **Rule:** an extension adds meaning or structure that is useful to many implementations but not required by all. It MUST NOT leak into core.
 
 **Examples of extension test vectors:**
 - `test-vectors/extensions/encryption/01-encrypted-envelope.uacp.json`
+- `test-vectors/extensions/vault-envelope/01-two-recipients-two-bundles.uacp.json`
 
 ---
 

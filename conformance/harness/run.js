@@ -63,6 +63,7 @@ function loadAjv() {
 function detectSchemaId(doc) {
   if (doc && typeof doc.uacp_encrypted === 'string') return 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-encryption'
   if (doc && typeof doc.uacp_export === 'string') return 'https://hn2.github.io/uacp/schema/0.6.0/export'
+  if (doc && typeof doc.uacp_vault_envelope === 'string') return 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vault-envelope'
   return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
