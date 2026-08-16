@@ -64,18 +64,23 @@ A **Profile** is a named extension document that specifies additional fields and
 
 ### Example Profile Declaration
 
+Core UACP's root object is closed (`unevaluatedProperties: false` in `schema/conversation.schema.json`) — it only accepts the fields listed in §1 above. A Profile therefore cannot add `profile` or `x-*` keys at the document root; it MUST nest them inside the core `metadata` object, which is the schema's designated freeform extension point.
+
 ```json
 {
-  "$schema": "https://uacp.dev/schema/v0.4.0/conversation.json",
-  "uacp_version": "0.4.0",
-  "profile": "https://fusionlayer.app/uacp-profile/v1",
-  "conversation_id": "...",
+  "$schema": "https://hn2.github.io/uacp/schema/0.6.0/conversation",
+  "uacp": "0.6.0",
+  "id": "conv-001",
+  "tool": "inkfold",
   "messages": [...],
-  "x-fusionlayer": {
-    "storage_mode": "private",
-    "persona_id": "inkfold-default",
-    "routing_vendor": "anthropic",
-    "cost_usd": 0.0024
+  "metadata": {
+    "profile": "https://fusionlayer.app/uacp-profile/v1",
+    "x-fusionlayer": {
+      "storage_mode": "private",
+      "persona_id": "inkfold-default",
+      "routing_vendor": "anthropic",
+      "cost_usd": 0.0024
+    }
   }
 }
 ```
@@ -86,12 +91,12 @@ A consumer that does not understand `x-fusionlayer` MUST ignore it and process t
 
 ## 3. Standard Namespace Convention
 
-Profile implementors MUST use the `x-` prefix convention:
+Profile implementors MUST use the `x-` prefix convention, nested under the core `metadata` object (see §2):
 
 ```
-x-{vendor}          FusionLayer:  x-fusionlayer
-                    Cursor:       x-cursor
-                    Your product: x-yourproduct
+metadata.x-{vendor}          FusionLayer:  metadata.x-fusionlayer
+                             Cursor:       metadata.x-cursor
+                             Your product: metadata.x-yourproduct
 ```
 
 Keys inside the namespace are free-form but SHOULD follow the same naming conventions as core UACP (snake_case, descriptive names).
@@ -104,25 +109,27 @@ The table below shows how FusionLayer-specific fields map to the profile pattern
 
 | FusionLayer concept | Core UACP field | Profile field |
 |--------------------|-----------------|---------------|
-| Storage / sharing mode | — | `x-fusionlayer.privacy_mode` (product-specific; core has the optional `metadata.uacp_privacy.level` convention only) |
-| Active AI persona | — | `x-fusionlayer.persona_id` |
-| Vendor selection | — | `x-fusionlayer.routing_vendor` |
-| Cost per message | — | `x-fusionlayer.cost_usd` |
-| Pseudonymizer mode | — | `x-fusionlayer.pseudonymizer_mode` |
-| Team / workspace | — | `x-fusionlayer.workspace_id` |
-| Plan tier | — | `x-fusionlayer.plan` |
+| Storage / sharing mode | — | `metadata.x-fusionlayer.privacy_mode` (product-specific; core has the optional `metadata.uacp_privacy.level` convention only) |
+| Active AI persona | — | `metadata.x-fusionlayer.persona_id` |
+| Vendor selection | — | `metadata.x-fusionlayer.routing_vendor` |
+| Cost per message | — | `metadata.x-fusionlayer.cost_usd` |
+| Pseudonymizer mode | — | `metadata.x-fusionlayer.pseudonymizer_mode` |
+| Team / workspace | — | `metadata.x-fusionlayer.workspace_id` |
+| Plan tier | — | `metadata.x-fusionlayer.plan` |
 
 ---
 
 ## 5. Interoperability Rule
 
-A UACP document that carries a Profile namespace extension MUST remain valid against core UACP schema after stripping all `x-*` keys. Implementors MUST verify this with the standard conformance harness:
+A UACP document that carries a Profile namespace extension MUST remain valid against the core UACP schema even after stripping `profile` and all `metadata.x-*` keys. Implementors MUST verify this with the repo's validator:
 
 ```bash
-# Strip all x- keys and validate against core schema
-jq 'del(.. | objects | with_entries(select(.key | startswith("x-"))))' input.json \
-  | node conformance/validate.js --schema schema/conversation.json
+# Strip profile + x- keys under metadata, then validate against the core schema
+jq 'del(.metadata.profile, .metadata."x-fusionlayer")' input.json > stripped.json
+node validate.js stripped.json
 ```
+
+(To check a whole batch of your own documents at once instead, drop them into `test-vectors/` and run `node validate.js`, which validates every file there against all schemas in `schema/`.)
 
 ---
 
