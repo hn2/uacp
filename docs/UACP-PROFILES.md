@@ -125,17 +125,8 @@ A UACP document that carries a Profile namespace extension MUST remain valid aga
 
 ```bash
 # Strip profile + x- keys under metadata, then validate against the core schema
-jq 'del(.metadata.profile, .metadata."x-fusionlayer") + {metadata: (.metadata // {})}' input.json > stripped.json
-node -e "
-const Ajv = require('ajv/dist/2020');
-const addFormats = require('ajv-formats');
-const ajv = new Ajv({ strict: false, allErrors: true });
-addFormats(ajv);
-const schema = require('./schema/conversation.schema.json');
-const doc = require('./stripped.json');
-const valid = ajv.compile(schema)(doc);
-console.log(valid ? 'valid' : 'invalid');
-"
+jq 'del(.metadata.profile, .metadata."x-fusionlayer")' input.json > stripped.json
+node validate.js stripped.json
 ```
 
 (To check a whole batch of your own documents at once instead, drop them into `test-vectors/` and run `node validate.js`, which validates every file there against all schemas in `schema/`.)
