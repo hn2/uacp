@@ -1,5 +1,28 @@
 # UACP Changelog
 
+## [Unreleased] — uacp-vault-envelope extension
+
+### Added
+- `spec/extensions/uacp-vault-envelope.md` — new optional extension (v1.0.0):
+  a multi-recipient encrypted, integrity-protected container for one or more
+  UACP bundles plus optional opaque companion payloads. Additive: a new root
+  document kind signaled by the `uacp_vault_envelope` field, alongside
+  `uacp`/`uacp_encrypted`/`uacp_export`/`uacp_context`. Existing consumers of
+  those kinds are unaffected. Crypto-agnostic at the spec level — key-wrap
+  and content-cipher algorithms are declared identifiers
+  (`key_wrap.algorithm`, `content_cipher.algorithm`), not fixed by the schema.
+- `schema/extensions/uacp-vault-envelope.schema.json` — extension schema.
+- `test-vectors/extensions/vault-envelope/` — two valid test vectors (single
+  and multi-recipient, with and without a companion payload).
+- `validate.js` — detects `uacp_vault_envelope` documents and routes them to
+  the new schema.
+- `CONFORMANCE.md`, `docs/UACP-BOUNDARY.md`, README §6/§11 updated to
+  register the new extension.
+
+Issue: #96.
+
+---
+
 ## [Unreleased] — v0.3 extension drafts
 
 ### Added (extension specs)

@@ -307,6 +307,14 @@ For implementations that want an interoperable encryption envelope, UACP provide
 
 The extension defines an AES-256-GCM sealed wrapper with Argon2id+HKDF key derivation. See the extension spec for the full normative description, field requirements, and key derivation pseudocode.
 
+For multi-recipient sharing of one or more bundles under a single shared key (rather than one passphrase-derived key per conversation), UACP provides the `uacp-vault-envelope` extension:
+
+- Schema: `schema/extensions/uacp-vault-envelope.schema.json`
+- Spec: [`spec/extensions/uacp-vault-envelope.md`](spec/extensions/uacp-vault-envelope.md)
+- Test vectors: `test-vectors/extensions/vault-envelope/`
+
+The extension is crypto-agnostic at the spec level: it defines the envelope shape, per-recipient key-wrap structure, and no-plaintext-content requirements, while the key-wrap and content-cipher algorithms are implementation-declared identifiers rather than fixed by the schema. See the extension spec for the full normative description and the algorithm identifier registry.
+
 ---
 
 ## 7. Context Injection Format
@@ -453,6 +461,7 @@ Implementations declare which optional extensions they use via the top-level `ex
 | Extension | Schema | Spec | Description |
 |-----------|--------|------|-------------|
 | `uacp-encryption` | `schema/extensions/uacp-encryption.schema.json` | [`spec/extensions/uacp-encryption.md`](spec/extensions/uacp-encryption.md) | AES-256-GCM envelope for encrypting conversation objects |
+| `uacp-vault-envelope` | `schema/extensions/uacp-vault-envelope.schema.json` | [`spec/extensions/uacp-vault-envelope.md`](spec/extensions/uacp-vault-envelope.md) | Multi-recipient encrypted container for one or more UACP bundles; crypto-agnostic algorithm identifiers |
 
 ```json
 {
