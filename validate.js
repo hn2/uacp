@@ -3,6 +3,9 @@ const fs = require('node:fs')
 const path = require('node:path')
 const Ajv = require('ajv/dist/2020')
 const addFormats = require('ajv-formats')
+const { validateMemoryLifecycle } = require('./lib/memory-lifecycle')
+const { validateMemoryTopics } = require('./lib/memory-topics')
+const { validateMemoryProfile } = require('./lib/memory-profile')
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'))
@@ -218,7 +221,10 @@ function main() {
           }
         }
 
-        const overallValid = valid && !cryptoError
+        const memoryErrors = kindSchema === 'memory' && valid
+          ? [...validateMemoryLifecycle(bodyToValidate), ...validateMemoryTopics(bodyToValidate), ...validateMemoryProfile(bodyToValidate)]
+          : []
+        const overallValid = valid && !cryptoError && memoryErrors.length === 0
 
         if (harnessModeActive && doc._expect === 'invalid') {
           if (!overallValid) {
@@ -226,6 +232,8 @@ function main() {
             let reason
             if (cryptoError) {
               reason = cryptoError
+            } else if (memoryErrors.length > 0) {
+              reason = memoryErrors.join('; ')
             } else {
               reason = errors.map(e => `body/${(e.instancePath || '').replace(/^\//, '')} ${e.message}`.trim()).join('; ')
             }
@@ -243,6 +251,8 @@ function main() {
             let reason
             if (cryptoError) {
               reason = cryptoError
+            } else if (memoryErrors.length > 0) {
+              reason = memoryErrors.join('; ')
             } else {
               reason = errors.map(e => `body/${(e.instancePath || '').replace(/^\//, '')} ${e.message}`.trim()).join('; ')
             }
@@ -291,7 +301,25 @@ function main() {
       if (kindSchemaId && ajv.getSchema(kindSchemaId)) {
         const kindValid = ajv.validate(kindSchemaId, doc.body)
         kindErrors = (ajv.errors || []).map(e => ({ ...e, instancePath: `body${e.instancePath}` }))
-        if (!kindValid) {
+        // NOTE: detectSchemaId() above resolves any plain kind+body envelope (memory included)
+        // against the chat-message conversation schema, which a kind+body envelope generally
+        // does not satisfy (no `messages`). In practice `valid` is already false by the time
+        // these memory-specific errors are appended, so this branch mostly matters for the
+        // harness-mode per-vector path (`_schema: "memory"` vectors above), not this full-envelope
+        // path. Pre-existing limitation for every kind, not introduced by the memory lifecycle
+        // work — see fusionlayerapp/uacp#102.
+        if (doc.kind === 'memory' && kindValid) {
+          kindErrors.push(...[
+            ...validateMemoryLifecycle(doc.body, { memoryId: doc.id }),
+            ...validateMemoryTopics(doc.body),
+            ...validateMemoryProfile(doc.body),
+          ]
+            .map(code => ({
+              instancePath: code.startsWith('MEMORY_LIFECYCLE_') ? 'body/lifecycle' : 'body',
+              message: code,
+            })))
+        }
+        if (kindErrors.length > 0) {
           kindErrors.forEach(e => errors.push(e))
         }
       }

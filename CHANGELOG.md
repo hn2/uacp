@@ -1,5 +1,34 @@
 # UACP Changelog
 
+## [Unreleased] — UACP-Memory@1 lifecycle, topics, and profile linkage
+
+### Added
+- `schema/v1/kinds/memory.schema.json` — additive optional fields: `lifecycle`
+  (action/status/revision/previous_revision), `supersedes`, `derived_from`,
+  `provenance`, `consent`, `topics`, `metadata`, and `profile_link`. Existing
+  valid Memory v1 documents remain valid unchanged.
+- `spec/v1/kinds/MEMORY.md` §4–§6 — normative rules for revision lineage,
+  supersession, tombstone/expire/rollback-as-new-revision, multi-source
+  provenance, the core topic registry, bounded typed metadata, and optional
+  structured-profile linkage (`user`/`project`/`team` schemas plus
+  collision-safe `<vendor>/<name>` namespacing).
+- `lib/memory-lifecycle.js`, `lib/memory-topics.js`, `lib/memory-profile.js` —
+  cross-field semantic validators returning stable `MEMORY_*` error codes for
+  rules JSON Schema alone cannot express; wired into `validate.js` for both
+  per-vector and full-envelope validation.
+- `conformance/memory/run.js` — new sequence-level conformance harness that
+  validates a chain of memory envelopes for stable-ID/predecessor lineage,
+  non-contiguous revisions, unresolved profile-field conflicts, and (opt-in)
+  UACP v1 `sha256:` signed-envelope integrity.
+- `conformance/memory/vectors/`, `conformance/vectors/kinds/memory.*.json` —
+  valid and invalid conformance vectors for lifecycle, topics, and profile
+  linkage.
+- `CONFORMANCE.md` — new requirement #10 (Memory lifecycle).
+
+Issues: #98 (epic), #99, #100, #101.
+
+---
+
 ## [Unreleased] — uacp-vault-envelope extension
 
 ### Added

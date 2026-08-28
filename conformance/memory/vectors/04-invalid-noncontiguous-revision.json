@@ -1,0 +1,26 @@
+{
+  "id": "memory-lifecycle-noncontiguous-revision",
+  "expected_outcome": "rejected",
+  "expected_error": "MEMORY_SEQUENCE_NON_CONTIGUOUS_REVISION",
+  "memories": [
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer light mode.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 }
+      }
+    },
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer dark mode.",
+        "lifecycle": {
+          "action": "update",
+          "status": "active",
+          "revision": 3,
+          "previous_revision": { "memory_id": "mem-theme", "revision": 1 }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "memory-lifecycle-valid-signed-chain",
+  "require_signed_envelopes": true,
+  "expected_outcome": "accepted",
+  "memories": [
+    {
+      "uacp_version": 1,
+      "kind": "memory",
+      "id": "mem-signed-theme",
+      "schema_version": 1,
+      "version": "1.0.0",
+      "subject": "urn:uacp:subject:example",
+      "author": "example-agent",
+      "created_at": "2026-08-27T00:00:00Z",
+      "signature": "sha256:8dde9fabb967e15046cd99191aa83a4a317f1b6443302a9d8157d50fdbf5395a",
+      "body": {
+        "content": "I prefer light mode.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 }
+      }
+    },
+    {
+      "uacp_version": 1,
+      "kind": "memory",
+      "id": "mem-signed-theme",
+      "schema_version": 1,
+      "version": "1.0.1",
+      "subject": "urn:uacp:subject:example",
+      "author": "example-agent",
+      "created_at": "2026-08-27T00:01:00Z",
+      "signature": "sha256:0007558ff6181831781fcaf3f8f2f871533a6039e40db404d37aee7e11b98751",
+      "body": {
+        "content": "I prefer dark mode.",
+        "lifecycle": {
+          "action": "supersede",
+          "status": "active",
+          "revision": 2,
+          "previous_revision": { "memory_id": "mem-signed-theme", "revision": 1 }
+        },
+        "supersedes": [{ "memory_id": "mem-signed-theme", "revision": 1 }]
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "memory-lifecycle-missing-predecessor",
+  "expected_outcome": "rejected",
+  "expected_error": "MEMORY_SEQUENCE_PREDECESSOR_NOT_FOUND",
+  "memories": [
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer dark mode.",
+        "lifecycle": {
+          "action": "update",
+          "status": "active",
+          "revision": 2,
+          "previous_revision": { "memory_id": "mem-theme", "revision": 1 }
+        }
+      }
+    }
+  ]
+}
