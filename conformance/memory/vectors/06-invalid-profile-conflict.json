@@ -1,0 +1,27 @@
+{
+  "id": "memory-profile-field-conflict",
+  "expected_outcome": "rejected",
+  "expected_error": "MEMORY_PROFILE_FIELD_CONFLICT",
+  "memories": [
+    {
+      "id": "mem-stack-a",
+      "subject": "subject-1",
+      "scope": "individual",
+      "body": {
+        "content": "My primary stack is Node.js.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 },
+        "profile_link": { "schema_id": "user", "schema_version": 1, "field": "primary_stack" }
+      }
+    },
+    {
+      "id": "mem-stack-b",
+      "subject": "subject-1",
+      "scope": "individual",
+      "body": {
+        "content": "My primary stack is Python.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 },
+        "profile_link": { "schema_id": "user", "schema_version": 1, "field": "primary_stack" }
+      }
+    }
+  ]
+}

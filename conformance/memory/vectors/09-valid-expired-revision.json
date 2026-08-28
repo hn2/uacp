@@ -1,0 +1,25 @@
+{
+  "id": "memory-lifecycle-valid-expired-revision",
+  "expected_outcome": "accepted",
+  "memories": [
+    {
+      "id": "mem-expiring-preference",
+      "body": {
+        "content": "I prefer the beta layout during the trial.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 }
+      }
+    },
+    {
+      "id": "mem-expiring-preference",
+      "body": {
+        "content": "The beta-layout preference has expired.",
+        "lifecycle": {
+          "action": "expire",
+          "status": "expired",
+          "revision": 2,
+          "previous_revision": { "memory_id": "mem-expiring-preference", "revision": 1 }
+        }
+      }
+    }
+  ]
+}

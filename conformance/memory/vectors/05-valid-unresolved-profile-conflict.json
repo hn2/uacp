@@ -1,0 +1,26 @@
+{
+  "id": "memory-profile-unresolved-conflict",
+  "expected_outcome": "accepted",
+  "memories": [
+    {
+      "id": "mem-stack-a",
+      "subject": "subject-1",
+      "scope": "individual",
+      "body": {
+        "content": "My primary stack is Node.js.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 },
+        "profile_link": { "schema_id": "user", "schema_version": 1, "field": "primary_stack", "conflict": "unresolved" }
+      }
+    },
+    {
+      "id": "mem-stack-b",
+      "subject": "subject-1",
+      "scope": "individual",
+      "body": {
+        "content": "My primary stack is Python.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 },
+        "profile_link": { "schema_id": "user", "schema_version": 1, "field": "primary_stack", "conflict": "unresolved" }
+      }
+    }
+  ]
+}

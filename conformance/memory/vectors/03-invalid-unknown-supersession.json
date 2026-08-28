@@ -1,0 +1,27 @@
+{
+  "id": "memory-lifecycle-unknown-supersession",
+  "expected_outcome": "rejected",
+  "expected_error": "MEMORY_SEQUENCE_REFERENCE_NOT_FOUND",
+  "memories": [
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer light mode.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 }
+      }
+    },
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer dark mode.",
+        "lifecycle": {
+          "action": "supersede",
+          "status": "active",
+          "revision": 2,
+          "previous_revision": { "memory_id": "mem-theme", "revision": 1 }
+        },
+        "supersedes": [{ "memory_id": "mem-theme", "revision": 99 }]
+      }
+    }
+  ]
+}

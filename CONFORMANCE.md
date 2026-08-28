@@ -63,6 +63,12 @@ To claim level N, an implementation MUST pass every check below at or below N:
    `uacp-vault-envelope` extension.
 9. **Negative cases** — the harness's negative test vectors (any file whose
    inline `uacp.test.expect` is `"invalid"`) MUST be rejected.
+10. **Memory lifecycle** — an implementation claiming `UACP-Memory@1` with
+   lifecycle support MUST preserve stable memory IDs, direct predecessor
+   lineage, and references to prior revisions. The reference sequence vectors
+   in `conformance/memory/vectors/` cover supersession, tombstones,
+   rollback-as-a-new-revision, profile-field conflicts, and (when a vector
+   sets `require_signed_envelopes`) UACP v1 `sha256:` envelope integrity.
 
 ## 3. Harness interface
 
@@ -100,6 +106,9 @@ node conformance/harness/run.js
 
 # Test your implementation:
 node conformance/harness/run.js --level L3 --impl ./path/to/my-impl.js
+
+# Validate Memory lifecycle sequence vectors:
+node conformance/memory/run.js
 ```
 
 The harness iterates every file in `test-vectors/` (including `test-vectors/extensions/`),

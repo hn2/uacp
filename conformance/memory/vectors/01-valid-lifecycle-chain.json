@@ -1,0 +1,51 @@
+{
+  "id": "memory-lifecycle-valid-chain",
+  "expected_outcome": "accepted",
+  "memories": [
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer light mode.",
+        "lifecycle": { "action": "create", "status": "active", "revision": 1 }
+      }
+    },
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer dark mode.",
+        "lifecycle": {
+          "action": "supersede",
+          "status": "active",
+          "revision": 2,
+          "previous_revision": { "memory_id": "mem-theme", "revision": 1 }
+        },
+        "supersedes": [{ "memory_id": "mem-theme", "revision": 1 }]
+      }
+    },
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer dark mode.",
+        "lifecycle": {
+          "action": "tombstone",
+          "status": "tombstoned",
+          "revision": 3,
+          "previous_revision": { "memory_id": "mem-theme", "revision": 2 }
+        }
+      }
+    },
+    {
+      "id": "mem-theme",
+      "body": {
+        "content": "I prefer light mode.",
+        "lifecycle": {
+          "action": "rollback",
+          "status": "active",
+          "revision": 4,
+          "previous_revision": { "memory_id": "mem-theme", "revision": 3 }
+        },
+        "derived_from": [{ "memory_id": "mem-theme", "revision": 1 }]
+      }
+    }
+  ]
+}
