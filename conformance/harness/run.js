@@ -67,7 +67,7 @@ function detectSchemaId(doc) {
   return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
-function resolveValidationTarget(doc) {
+function resolveValidationTarget(doc, ajv) {
   if (doc && typeof doc.fixture_id === 'string') {
     if (doc.event && typeof doc.event === 'object') {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-sync-event', target: doc.event }
@@ -103,11 +103,20 @@ function resolveValidationTarget(doc) {
       return { schemaId: 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-audit-event', target: doc.audit_event }
     }
   }
+  // A generic kind+body artifact envelope (memory, persona, pack, etc.) is not
+  // a chat conversation and must be validated against its own kind schema,
+  // not the conversation schema — see fusionlayerapp/uacp#102.
+  if (doc && typeof doc.kind === 'string' && doc.body !== undefined) {
+    const kindSchemaId = `https://hn2.github.io/uacp/schema/v1/kinds/${doc.kind}`
+    if (ajv.getSchema(kindSchemaId)) {
+      return { schemaId: kindSchemaId, target: doc.body }
+    }
+  }
   return { schemaId: detectSchemaId(doc), target: doc }
 }
 
 function validateDoc(ajv, doc) {
-  const { schemaId, target } = resolveValidationTarget(doc)
+  const { schemaId, target } = resolveValidationTarget(doc, ajv)
   const valid = ajv.validate(schemaId, target)
   const errors = (ajv.errors || []).map(e => `${e.instancePath || '(root)'} ${e.message}`)
   return { valid, errors }

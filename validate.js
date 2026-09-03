@@ -62,6 +62,19 @@ function detectSchemaId(doc) {
   if (doc && typeof doc.uacp_vault_envelope === 'string') {
     return 'https://hn2.github.io/uacp/schema/0.6.0/extensions/uacp-vault-envelope'
   }
+  // A generic kind+body artifact envelope (memory, persona, pack, etc. — see
+  // schema/v1/kinds/) is not a chat conversation: it has no `messages` array
+  // and the conversation schema's `unevaluatedProperties: false` would reject
+  // `kind`/`body` outright. It MUST NOT be routed to the conversation schema.
+  // Its structural correctness is judged entirely by its own per-kind body
+  // schema, resolved separately in detectKindSchemaId(). Returning null here
+  // means "no envelope-level schema to check" — see fusionlayerapp/uacp#102,
+  // where every kind+body envelope was previously forced through the
+  // conversation schema and always failed there regardless of the body's
+  // actual correctness, making the per-kind validation below dead code.
+  if (doc && typeof doc.kind === 'string' && doc.body !== undefined) {
+    return null
+  }
   return 'https://hn2.github.io/uacp/schema/0.6.0/conversation'
 }
 
@@ -292,8 +305,11 @@ function main() {
 
       const expectInvalid = harnessModeActive && doc && doc.metadata && doc.metadata['uacp.test.expect'] === 'invalid'
       const schemaId = detectSchemaId(doc)
-      const valid = ajv.validate(schemaId, doc)
-      const errors = ajv.errors || []
+      // schemaId is null for kind+body envelopes (see detectSchemaId): there is
+      // no applicable envelope-level schema, so envelope-level validation is
+      // vacuously true and the per-kind body schema below is authoritative.
+      const valid = schemaId ? ajv.validate(schemaId, doc) : true
+      const errors = schemaId ? (ajv.errors || []) : []
 
       // Also validate body against kind schema if envelope has kind + body
       const kindSchemaId = detectKindSchemaId(doc)
@@ -301,13 +317,13 @@ function main() {
       if (kindSchemaId && ajv.getSchema(kindSchemaId)) {
         const kindValid = ajv.validate(kindSchemaId, doc.body)
         kindErrors = (ajv.errors || []).map(e => ({ ...e, instancePath: `body${e.instancePath}` }))
-        // NOTE: detectSchemaId() above resolves any plain kind+body envelope (memory included)
-        // against the chat-message conversation schema, which a kind+body envelope generally
-        // does not satisfy (no `messages`). In practice `valid` is already false by the time
-        // these memory-specific errors are appended, so this branch mostly matters for the
-        // harness-mode per-vector path (`_schema: "memory"` vectors above), not this full-envelope
-        // path. Pre-existing limitation for every kind, not introduced by the memory lifecycle
-        // work — see fusionlayerapp/uacp#102.
+        // A kind+body envelope's overall validity is now decided entirely by
+        // this per-kind body schema check (and, for memory, the semantic
+        // lifecycle/topics/profile checks below) — detectSchemaId() skips the
+        // unrelated chat-message conversation schema for these documents, so
+        // `valid` above is already true and kindErrors here is the deciding
+        // factor. This was previously dead code for every kind (see
+        // fusionlayerapp/uacp#102); fixed generally, not just for memory.
         if (doc.kind === 'memory' && kindValid) {
           kindErrors.push(...[
             ...validateMemoryLifecycle(doc.body, { memoryId: doc.id }),
